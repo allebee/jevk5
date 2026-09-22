@@ -3,4 +3,4 @@
 from jevk5.runtime import JevK5, decision_options
 
 __all__ = ["JevK5", "decision_options"]
-__version__ = "0.1.1"
+__version__ = "0.2.0"

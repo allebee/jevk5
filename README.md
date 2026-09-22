@@ -19,25 +19,32 @@ JevBench v1.2, 231 public items, through JevBench's own runner (`bench/jevk5_dir
 231/231 valid, 0 failures. "Untrained" is the same base model and prompt without the LoRA or the
 temperature; its answers match SemIf's official public outcomes on all 231 items.
 
-| Split | n | Untrained Qwen3.5-4B | **JevK5 v0.1** |
-|---|---:|---:|---:|
-| easy | 48 | 1.000 | **1.000** |
-| original (standard) | 72 | 0.986 | 0.958 |
-| hard (public half) | 111 | 0.613 | **0.676** |
-| hard-tier ECE | | 0.117 | **0.082** |
+| Split | n | Untrained Qwen3.5-4B | JevK5 v0.1 | **JevK5 v0.2** |
+|---|---:|---:|---:|---:|
+| easy | 48 | 1.000 | 1.000 | **1.000** |
+| original (standard) | 72 | 0.986 | 0.958 | 0.958 |
+| hard (public half) | 111 | 0.613 | 0.676 | **0.739** |
+| hard-tier ECE | | 0.117 | 0.082 | **0.066** |
+| distance to the exact gold distributions | | 0.298 | 0.296 | **0.196** |
 
 Latency on one H100 (in-process, batch 1): p50 13.5 ms, p95 14.9 ms on easy and standard items;
 p50 30 ms, p95 161 ms on hard items with 1-4k-token documents. Per-item results are in
 [results/public231](results/public231). These are public-item numbers from our own runs, not an
 official JevBench score.
 
-**Known weak spots:** two standard-tier items that the untrained model answers correctly are
-wrong after training; probability fidelity on exact-distribution items is mean TVD 0.296.
+On the hard tier v0.2 fixes 21 of the untrained model's items and breaks 7 (McNemar p = 0.013);
+against v0.1 it fixes 9 and breaks 2. Per family, the gains are probability 0.50 -> 0.70, ambiguous
+0.71 -> 0.86, trade-offs 0.83 -> 1.00, long policies 0.47 -> 0.58, multi-step lookups 0.72 -> 0.78
+and dates and numbers 0.40 -> 0.47; judging answers slips 0.82 -> 0.76 (one item).
+
+**Known weak spots:** two standard-tier items that the untrained model answers correctly are wrong
+after training (an unchanged policy pair); the temperature is fitted on hard questions, so
+standard-tier confidence is now too low (ECE 0.141 there, against 0.066 on the hard tier).
 
 ## Install and use
 
 ```bash
-pip install "jevk5[fast] @ git+https://github.com/allebee/jevk5@v0.1.1"
+pip install "jevk5[fast] @ git+https://github.com/allebee/jevk5@v0.2.0"
 ```
 
 ```python
@@ -77,10 +84,13 @@ linear-attention layers fall back to transformers' PyTorch code.
    extraction, rubrics). It answers every question twice, independently; a question is kept only
    when both answers match the intended one. Option keys are rebuilt from the option text.
 2. **Training** ([training/lora.py](training/lora.py)): LoRA rank 16 on attention projections,
-   cross-entropy on the option-letter logits, 1,635 teacher questions + 1,635 human-labelled items
-   (MMLU-Pro, WANLI, MultiNLI, BoolQ, banking77, ARC, CommonsenseQA), 2 epochs, lr 3e-5.
-3. **Calibration:** one temperature (1.367), fitted on teacher questions from three domains that
-   training never saw, where accuracy rose from 77.6% to 84.2%.
+   cross-entropy on the option-letter logits, 3,272 teacher questions + 3,272 human-labelled items
+   (MMLU-Pro, WANLI, MultiNLI, BoolQ, banking77, ARC, CommonsenseQA), 2 epochs, lr 3e-5. A question
+   that carries an exact distribution trains against it rather than a single letter (9 so far).
+3. **Calibration:** one temperature (1.532), fitted on teacher questions from three domains that
+   training never saw. A temperature per question type and averaging two option orders were both
+   measured on held-out data and rejected ([training/temp_choice.py](training/temp_choice.py),
+   [training/order_avg.py](training/order_avg.py)).
 
 No JevBench item and no output of Jev was used for training, tuning or model selection.
 
