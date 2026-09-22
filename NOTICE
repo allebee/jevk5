@@ -1,0 +1,22 @@
+JevK5
+Copyright 2026 the JevK5 authors (github.com/allebee, huggingface.co/alibiserikbay)
+
+This product includes software and model weights developed by others:
+
+- Qwen3.5-4B (base weights) and Qwen3.6-27B (teacher), by the Qwen team, Apache License 2.0.
+
+- The decision prompt (system instruction and JSON payload of evidence, criterion and lettered
+  options) and the one-pass readout (softmax over the answer letters' next-token logits) are
+  adapted from SemIf by TheoLeeCJ (https://github.com/TheoLeeCJ/SemIf), MIT License:
+
+    Copyright (c) TheoLeeCJ
+    Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+    and associated documentation files (the "Software"), to deal in the Software without
+    restriction, including without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following conditions: The above copyright
+    notice and this permission notice shall be included in all copies or substantial portions of
+    the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+
+- Training replay data from MMLU-Pro (MIT), WANLI (CC BY 4.0), MultiNLI, BoolQ (CC BY-SA 3.0),
+  banking77 (CC BY 4.0), ARC (CC BY-SA 4.0) and CommonsenseQA (MIT), under their own licenses.

@@ -1,0 +1,7 @@
+__pycache__/
+*.egg-info/
+.venv/
+data/
+models/
+.DS_Store
+ISSUE_DRAFT.md

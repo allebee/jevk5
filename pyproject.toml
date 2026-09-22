@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jevk5"
+version = "0.1.0"
+description = "JevK5: a fast, calibrated, open decision model (Qwen3.5-4B + distilled LoRA), one forward pass"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+dependencies = [
+  "torch>=2.7",
+  "transformers>=5.17",
+  "accelerate>=1.12",
+  "huggingface-hub>=1.0",
+  "numpy",
+  "jinja2>=3.1",
+]
+
+[project.optional-dependencies]
+fast = ["flash-linear-attention>=0.5", "einops"]
+
+[project.scripts]
+jevk5-serve = "jevk5.server:main"
+
+[tool.setuptools.packages.find]
+include = ["jevk5*"]
