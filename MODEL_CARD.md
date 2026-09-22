@@ -69,7 +69,7 @@ answers match SemIf's official public outcomes on 231/231 items).
 - Two standard-tier public items that the untrained model gets right are wrong after training
   (98.6% → 95.8%); v0.2 targets this.
 - Probability fidelity on exact-distribution items: mean total variation 0.296 on the 10 public ones.
-- English only. Needs a CUDA GPU with ~9 GB for bf16. Inputs over 4,096 tokens are refused, not cut.
+- English only. Needs a CUDA GPU with ~9 GB for bf16. Inputs over 16,384 tokens are refused, not cut.
 
 ## Use
 

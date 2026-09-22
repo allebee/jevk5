@@ -37,7 +37,7 @@ wrong after training; probability fidelity on exact-distribution items is mean T
 ## Install and use
 
 ```bash
-pip install "jevk5[fast] @ git+https://github.com/allebee/jevk5@v0.1.0"
+pip install "jevk5[fast] @ git+https://github.com/allebee/jevk5@v0.1.1"
 ```
 
 ```python

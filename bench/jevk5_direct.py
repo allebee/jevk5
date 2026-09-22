@@ -8,6 +8,8 @@ Hub commit. Option mapping is the same as JevBench's semif_direct adapter:
   * score  -> options "0".."k-1", "<i>: <level text>"
 The distribution is the softmax over the declared answer letters' logits at the last position,
 divided by JevK5's calibration temperature (jevk5_config.json next to the weights).
+Inputs up to 16,384 tokens are answered (CUDA graphs up to 4,096, eager beyond); longer ones
+are refused, never truncated.
 """
 
 from __future__ import annotations
@@ -23,7 +25,7 @@ class JevK5DirectAdapter:
 
     def __init__(self, endpoint=None, model=None, key_env="", timeout_s=None,
                  price_input_per_m=None, price_output_per_m=None, revision=None,
-                 max_tokens=4096):
+                 max_tokens=16384):
         self.endpoint = endpoint or "alibiserikbay/JevK5"
         self.model = model or self.endpoint
         self.revision = revision

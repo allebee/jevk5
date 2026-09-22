@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jevk5"
-version = "0.1.0"
+version = "0.1.1"
 description = "JevK5: a fast, calibrated, open decision model (Qwen3.5-4B + distilled LoRA), one forward pass"
 readme = "README.md"
 license = "Apache-2.0"
