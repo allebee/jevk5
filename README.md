@@ -94,6 +94,15 @@ linear-attention layers fall back to transformers' PyTorch code.
 
 No JevBench item and no output of Jev was used for training, tuning or model selection.
 
+## It also plays Tetris, badly and well
+
+[`examples/tetris.py`](examples/tetris.py) turns Tetris into typed decisions. Reading the board as
+characters, JevK5 plays at random: 0.0 lines a game, topping out after 26 pieces, usually taking the
+first option offered. Asked instead which placement leaves the best board, with each option
+described by what it does ("clears 1 row, buries 0 new cells, tallest column 6"), the same weights
+clear **14.9 lines a game** and survive three times longer, at 20-25 ms a decision. A 20-line
+heuristic still clears three times more. [What that gap means](examples/README.md).
+
 ## Reproduce the JevBench run
 
 See [bench/SUBMISSION.md](bench/SUBMISSION.md).
