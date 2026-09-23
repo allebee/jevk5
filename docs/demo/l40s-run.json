@@ -1,0 +1,159 @@
+{
+  "recorded_at_utc": "2026-09-23T17:14:04.652138+00:00",
+  "model": "alibiserikbay/JevK5",
+  "model_commit": "3c673298eb7f2dc7cb98019262c55b1fac01a0bc",
+  "gpu": "NVIDIA L40S",
+  "gpu_memory_gib": 44.41845703125,
+  "python": "3.10.12",
+  "packages": {
+    "jevk5": "0.2.0",
+    "torch": "2.9.1+cu126",
+    "transformers": "5.17.0",
+    "accelerate": "1.15.0",
+    "flash-linear-attention": "0.5.2"
+  },
+  "cuda": "12.6",
+  "temperature": 1.532,
+  "graph_lengths": [
+    128,
+    192,
+    256,
+    320,
+    384,
+    512,
+    640,
+    768,
+    1024,
+    1536,
+    2048,
+    3072,
+    4096
+  ],
+  "load_seconds": 19.607807847000004,
+  "peak_gpu_allocated_gib": 8.476170063018799,
+  "peak_gpu_reserved_gib": 10.857421875,
+  "warmup_calls": 3,
+  "state": "I was charged twice for order #7120. Please refund the duplicate charge.",
+  "question": {
+    "type": "choice",
+    "instructions": "Which team should handle this support ticket?",
+    "criteria": {
+      "billing": "Payments, invoices, charges, and refunds.",
+      "technical": "Software bugs, errors, and broken integrations.",
+      "sales": "Pricing, product questions, and new purchases."
+    }
+  },
+  "answer": {
+    "type": "choice",
+    "confidence": 0.9939180612564087,
+    "input_tokens": 152,
+    "choice": "billing",
+    "probabilities": {
+      "billing": 0.9939180612564087,
+      "technical": 0.004943777807056904,
+      "sales": 0.001138214603997767
+    }
+  },
+  "decision_ms": 20.599775000050613,
+  "warm_timings_ms": [
+    20.97259300001042,
+    20.89424100006454,
+    20.500295000033475,
+    20.44603299998471,
+    20.447384000021884,
+    20.475924000038503,
+    20.49234499997965,
+    20.462424000015744,
+    20.429743000022427,
+    20.64719800000603,
+    20.537784999987707,
+    20.463994000010644,
+    20.485653999912756,
+    20.467413999995188,
+    20.44400299996596,
+    20.445103000042764,
+    20.506855000007818,
+    20.518025000001217,
+    20.527184999991732,
+    20.504944999970576,
+    20.52042499997242,
+    20.542215999967084,
+    20.526714000084212,
+    20.4363730000523,
+    20.434493999914594,
+    20.38046299992402,
+    20.369252000023153,
+    20.475094999937937,
+    20.64108699994449,
+    20.56730599997536
+  ],
+  "p50_ms": 20.488999499946203,
+  "p95_ms": 20.89424100006454,
+  "duration_seconds": 27.006103029999963,
+  "events": [
+    {
+      "seconds": 0.0,
+      "text": "JevK5 | A support ticket becomes a typed decision"
+    },
+    {
+      "seconds": 0.0001,
+      "text": "GPU: NVIDIA L40S (44.4 GiB)"
+    },
+    {
+      "seconds": 0.0001,
+      "text": "Mode: bf16, batch 1, CUDA graphs, model preloaded"
+    },
+    {
+      "seconds": 3.0031,
+      "text": "\nTicket: I was charged twice for order #7120. Please refund the duplicate charge."
+    },
+    {
+      "seconds": 6.0011,
+      "text": "Question: Which team should handle this support ticket?"
+    },
+    {
+      "seconds": 6.0012,
+      "text": "Options: billing / technical / sales"
+    },
+    {
+      "seconds": 9.0218,
+      "text": "\nDecision: billing"
+    },
+    {
+      "seconds": 9.0219,
+      "text": "  P(billing): 0.993918"
+    },
+    {
+      "seconds": 9.0219,
+      "text": "  P(technical): 0.004944"
+    },
+    {
+      "seconds": 9.0219,
+      "text": "  P(sales): 0.001138"
+    },
+    {
+      "seconds": 9.0219,
+      "text": "Input: 152 tokens | Generated: 0 tokens"
+    },
+    {
+      "seconds": 9.0219,
+      "text": "This decision: 20.60 ms"
+    },
+    {
+      "seconds": 16.6211,
+      "text": "\n30 warm calls, same ticket: p50 20.49 ms | p95 20.89 ms"
+    },
+    {
+      "seconds": 16.6212,
+      "text": "Timing includes tokenization and GPU synchronization; excludes model loading."
+    },
+    {
+      "seconds": 22.0054,
+      "text": "\nOpen weights + training code | Apache-2.0"
+    },
+    {
+      "seconds": 22.0055,
+      "text": "github.com/allebee/jevk5"
+    }
+  ]
+}
