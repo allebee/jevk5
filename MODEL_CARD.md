@@ -8,17 +8,26 @@ tags:
 - decision-model
 - system-one
 - jev
+- jev-alternative
+- typed-decisions
+- self-hosted
 - jevbench
 - calibration
 - distillation
 ---
 
-# JevK5 v0.2
+# JevK5 v0.2 — open-weight Jev alternative
 
-An open decision model for typed questions about any state: yes/no, choice and score. It reads a
-document and a question and returns a **calibrated probability for every option in one forward
-pass, with zero generated tokens**. It speaks TypeSafe's `/v1/systemone` shape, so it is a
-drop-in for Jev-style clients.
+JevK5 is an independent, Apache-2.0 open-source alternative to TypeSafe's Jev for typed
+decisions. It reads a state and a yes/no (`noul`), choice, or score question and returns a
+**probability for every option in one forward pass, with zero generated tokens**. The
+[open weights](https://huggingface.co/alibiserikbay/JevK5) can be self-hosted using the
+[JevK5 runtime](https://github.com/allebee/jevk5), which serves a TypeSafe-style
+`/v1/systemone` endpoint. This is not Jev's model or architecture and is not affiliated with
+TypeSafe AI.
+
+Use the JevK5 runtime shown below to read option probabilities. Generic text-generation examples
+on the Hub call `generate()` and do not perform JevK5's decision readout.
 
 - **Base:** Qwen3.5-4B, with a LoRA (rank 16, attention projections) merged into the weights
 - **Readout:** SemIf's protocol (TheoLeeCJ/SemIf, MIT): a softmax over the answer letters'
@@ -26,6 +35,17 @@ drop-in for Jev-style clients.
 - **Runtime:** [github.com/allebee/jevk5](https://github.com/allebee/jevk5). One CUDA graph per
   padded input length: ~13 ms per decision on an H100 (eager transformers: ~70 ms), same answers
 - **License:** Apache-2.0
+
+## Independent evaluation: JevBench v1.4
+
+[JevBench](https://github.com/fstandhartinger/jevbench) ranks JevK5 v0.2 **#2 of 76 systems and
+#1 among open entrants** on its v1.4 composite score: 62.04, compared with 63.29 for Jev 1.13.0.
+The benchmark combines intelligence, calibration, speed, and cost. Its
+[published aggregates](https://github.com/fstandhartinger/jevbench/blob/main/results/v1.4/jevbench-v1.4-results.json)
+report 33.1% accuracy for JevK5 and 36.7% for Jev on 308 fresh sealed decisions, compared with
+85.3% and 86.6% on the 231 public decisions. The evaluator describes the sealed set as unusually
+difficult and warns that small sealed differences do not prove pairwise superiority. These are
+benchmark results, not a measurement of production workflow quality.
 
 ## How it was trained
 
@@ -75,6 +95,8 @@ Distance to the exact gold distributions on the 10 public probability items: 0.1
 
 ## Known weak spots
 
+- Accuracy drops sharply on JevBench's fresh sealed decisions. Real-world workflow performance
+  against Jev has not yet been measured.
 - Two standard-tier public items that the untrained model gets right are wrong after training
   (98.6% → 95.8%): one policy pair, unchanged since v0.1.
 - The temperature is fitted on hard questions, so standard-tier answers are now underconfident

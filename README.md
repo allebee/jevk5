@@ -1,15 +1,17 @@
-# JevK5
+# JevK5 — an open-weight Jev alternative
 
-**An open decision model: typed answers with calibrated probabilities, in one forward pass.**
+JevK5 is an independent, Apache-2.0 open-source alternative to TypeSafe's Jev for typed
+decisions. Give it a state (a ticket, log, policy, or diff) and a yes/no, choice, or score question.
+It returns a probability for every option in one forward pass, with zero generated tokens. The
+[weights](https://huggingface.co/alibiserikbay/JevK5) run on your own GPU, and the server accepts
+the TypeSafe-style `/v1/systemone` request shape. JevK5 is not affiliated with TypeSafe AI.
 
-Give it a state (a ticket, a log, a policy, a diff) and typed questions: yes/no, choice, or score.
-It returns a probability for every option, with zero generated tokens, in about 13 ms on one
-GPU. It answers TypeSafe's `/v1/systemone` shape, so Jev-style clients can point at it.
-
-**[JevBench v1.4](https://benchmarkheaven.com/jev-models) ranks JevK5 v0.2 second of 76 systems**,
-behind Jev 1.13.0 (63.29 against 62.04) and ahead of every other open system. Judge tier 0.945,
-identical to Jev's; the fastest Speed axis in the top five. Measured by the benchmark's author on
-their own hardware, not by us.
+**Independent result:** [JevBench v1.4](https://github.com/fstandhartinger/jevbench) ranks JevK5
+v0.2 **second of 76 systems and first among open entrants** (62.04; Jev 1.13.0: 63.29). On its
+308 fresh sealed decisions, JevK5 answered 33.1% correctly and Jev answered 36.7%; the
+[evaluator calls this set unusually difficult](https://github.com/fstandhartinger/jevbench/blob/main/docs/METHOD-v1.4.md).
+The ranking measures JevBench's mix of accuracy, calibration, speed, and cost, not performance on
+every production workflow. JevK5's reported H100 latency is about 13 ms for short decisions.
 
 ## Watch it run
 
@@ -34,6 +36,15 @@ This game is not a Jev comparison.
 | Readout | SemIf's protocol: a softmax over the answer letters' next-token logits, one temperature |
 | Runtime | One CUDA graph per padded input length: 13 ms vs ~70 ms eager on an H100, same answers |
 | Training | Distilled from Qwen3.6-27B with thinking, on hard decisions it wrote and checked twice |
+
+## How JevK5 differs from Jev
+
+JevK5 uses open Qwen3.5-4B weights and [SemIf's option-logit readout](https://github.com/TheoLeeCJ/SemIf),
+not Jev's unpublished model architecture. It supports the same three decision types—`noul`
+(yes/no), `choice`, and `score`—through a TypeSafe-style endpoint. Each question is evaluated
+separately; the server serializes requests on one GPU. The model is English-only, supports up to
+16 options, and refuses inputs over 16,384 tokens. Its quality on Jev's published real-world
+workflows has not yet been measured.
 
 ## Results on JevBench's public items
 
