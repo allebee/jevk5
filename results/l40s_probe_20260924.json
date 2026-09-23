@@ -1,0 +1,1415 @@
+{
+  "local_date": "2026-09-24",
+  "instance": "siqyr-qwen38",
+  "gpu": "NVIDIA L40S 48 GB",
+  "checkpoint": "alibiserikbay/JevK5",
+  "workflow_cases": {
+    "created_utc": "2026-09-23T19:32:21.777281+00:00",
+    "model": "alibiserikbay/JevK5",
+    "platform": "Linux-5.15.0-126-generic-x86_64-with-glibc2.35",
+    "gpu": "NVIDIA L40S",
+    "pytorch": "2.9.1+cu126",
+    "summary": {
+      "browser": {
+        "correct": 11,
+        "total": 12,
+        "latencies_ms": [
+          71.59,
+          52.51,
+          53.09,
+          61.05,
+          64.37,
+          62.34,
+          53.34,
+          27.84,
+          27.63,
+          27.57,
+          26.64,
+          61.7
+        ]
+      },
+      "router": {
+        "correct": 10,
+        "total": 12,
+        "latencies_ms": [
+          28.85,
+          28.87,
+          28.54,
+          28.39,
+          28.47,
+          28.55,
+          27.34,
+          27.14,
+          26.63,
+          26.38,
+          0,
+          0
+        ]
+      },
+      "extraction": {
+        "correct": 12,
+        "total": 12,
+        "latencies_ms": [
+          26.45,
+          27.89,
+          28.29,
+          27.35,
+          26.94,
+          26.81,
+          27.99,
+          29.54,
+          27.4,
+          26.96,
+          24.6,
+          26.69
+        ]
+      }
+    },
+    "cases": [
+      {
+        "id": "browser_search_blank",
+        "group": "browser",
+        "gold": "TYPE_TEXT:q",
+        "prediction": "TYPE_TEXT:q",
+        "correct": true,
+        "latency_ms": 71.59,
+        "operation_probabilities": {
+          "TYPE_TEXT": 0.6635133624076843,
+          "CLICK": 0.062262602150440216,
+          "WAIT": 0.08629150688648224,
+          "DONE": 0.035170651972293854,
+          "BLOCKED": 0.15276183187961578
+        },
+        "target_probabilities": {
+          "q": 1.0
+        },
+        "input_tokens": 373
+      },
+      {
+        "id": "browser_search_ready",
+        "group": "browser",
+        "gold": "CLICK:go",
+        "prediction": "CLICK:go",
+        "correct": true,
+        "latency_ms": 52.51,
+        "operation_probabilities": {
+          "TYPE_TEXT": 0.22584164142608643,
+          "CLICK": 0.3998073637485504,
+          "WAIT": 0.15018534660339355,
+          "DONE": 0.06121248006820679,
+          "BLOCKED": 0.16295315325260162
+        },
+        "target_probabilities": {
+          "go": 1.0
+        },
+        "input_tokens": 380
+      },
+      {
+        "id": "browser_open_result",
+        "group": "browser",
+        "gold": "CLICK:red",
+        "prediction": "CLICK:red",
+        "correct": true,
+        "latency_ms": 53.09,
+        "operation_probabilities": {
+          "CLICK": 0.9318563342094421,
+          "WAIT": 0.01452616322785616,
+          "DONE": 0.027901843190193176,
+          "BLOCKED": 0.0257156640291214
+        },
+        "target_probabilities": {
+          "red": 0.9967032074928284,
+          "blue": 0.003296836279332638
+        },
+        "input_tokens": 351
+      },
+      {
+        "id": "browser_flight_origin",
+        "group": "browser",
+        "gold": "TYPE_TEXT:from",
+        "prediction": "TYPE_TEXT:from",
+        "correct": true,
+        "latency_ms": 61.05,
+        "operation_probabilities": {
+          "TYPE_TEXT": 0.5311618447303772,
+          "CLICK": 0.12229041755199432,
+          "WAIT": 0.09573845565319061,
+          "DONE": 0.08132349699735641,
+          "BLOCKED": 0.16948577761650085
+        },
+        "target_probabilities": {
+          "from": 0.9631626009941101,
+          "to": 0.03683742135763168
+        },
+        "input_tokens": 404
+      },
+      {
+        "id": "browser_flight_suggestion",
+        "group": "browser",
+        "gold": "CLICK:bos",
+        "prediction": "CLICK:bos",
+        "correct": true,
+        "latency_ms": 64.37,
+        "operation_probabilities": {
+          "CLICK": 0.388202041387558,
+          "TYPE_TEXT": 0.21928606927394867,
+          "WAIT": 0.18626882135868073,
+          "DONE": 0.12386944890022278,
+          "BLOCKED": 0.08237355947494507
+        },
+        "target_probabilities": {
+          "bos": 0.5203868746757507,
+          "go": 0.47961315512657166
+        },
+        "input_tokens": 427
+      },
+      {
+        "id": "browser_flight_destination",
+        "group": "browser",
+        "gold": "TYPE_TEXT:to",
+        "prediction": "TYPE_TEXT:to",
+        "correct": true,
+        "latency_ms": 62.34,
+        "operation_probabilities": {
+          "TYPE_TEXT": 0.46685346961021423,
+          "CLICK": 0.22400793433189392,
+          "WAIT": 0.09130097180604935,
+          "DONE": 0.09130097180604935,
+          "BLOCKED": 0.12653672695159912
+        },
+        "target_probabilities": {
+          "from": 0.12365924566984177,
+          "to": 0.8763407468795776
+        },
+        "input_tokens": 404
+      },
+      {
+        "id": "browser_filter",
+        "group": "browser",
+        "gold": "CLICK:nonstop",
+        "prediction": "CLICK:nonstop",
+        "correct": true,
+        "latency_ms": 53.34,
+        "operation_probabilities": {
+          "CLICK": 0.7769020795822144,
+          "WAIT": 0.057073939591646194,
+          "DONE": 0.07290267199277878,
+          "BLOCKED": 0.09312138706445694
+        },
+        "target_probabilities": {
+          "nonstop": 0.9931535720825195,
+          "first": 0.006846458651125431
+        },
+        "input_tokens": 347
+      },
+      {
+        "id": "browser_filter_already_set",
+        "group": "browser",
+        "gold": "DONE",
+        "prediction": "DONE",
+        "correct": true,
+        "latency_ms": 27.84,
+        "operation_probabilities": {
+          "CLICK": 0.22232048213481903,
+          "WAIT": 0.06025811284780502,
+          "DONE": 0.5918378233909607,
+          "BLOCKED": 0.12558354437351227
+        },
+        "target_probabilities": null,
+        "input_tokens": 351
+      },
+      {
+        "id": "browser_loading",
+        "group": "browser",
+        "gold": "WAIT",
+        "prediction": "BLOCKED",
+        "correct": false,
+        "latency_ms": 27.63,
+        "operation_probabilities": {
+          "CLICK": 0.0340600311756134,
+          "WAIT": 0.30831673741340637,
+          "DONE": 0.015062333084642887,
+          "BLOCKED": 0.6425608992576599
+        },
+        "target_probabilities": null,
+        "input_tokens": 325
+      },
+      {
+        "id": "browser_done",
+        "group": "browser",
+        "gold": "DONE",
+        "prediction": "DONE",
+        "correct": true,
+        "latency_ms": 27.57,
+        "operation_probabilities": {
+          "CLICK": 0.34915855526924133,
+          "WAIT": 0.03857190161943436,
+          "DONE": 0.5250480771064758,
+          "BLOCKED": 0.08722148090600967
+        },
+        "target_probabilities": null,
+        "input_tokens": 322
+      },
+      {
+        "id": "browser_blocked",
+        "group": "browser",
+        "gold": "BLOCKED",
+        "prediction": "BLOCKED",
+        "correct": true,
+        "latency_ms": 26.64,
+        "operation_probabilities": {
+          "WAIT": 0.021016860380768776,
+          "DONE": 0.006180713418871164,
+          "BLOCKED": 0.972802460193634
+        },
+        "target_probabilities": null,
+        "input_tokens": 279
+      },
+      {
+        "id": "browser_injection",
+        "group": "browser",
+        "gold": "TYPE_TEXT:q",
+        "prediction": "TYPE_TEXT:q",
+        "correct": true,
+        "latency_ms": 61.7,
+        "operation_probabilities": {
+          "TYPE_TEXT": 0.584863007068634,
+          "CLICK": 0.08954533189535141,
+          "WAIT": 0.12410353124141693,
+          "DONE": 0.042966078966856,
+          "BLOCKED": 0.15852206945419312
+        },
+        "target_probabilities": {
+          "q": 1.0
+        },
+        "input_tokens": 401
+      },
+      {
+        "id": "router_research",
+        "group": "router",
+        "gold": "research_agent",
+        "prediction": "research_agent",
+        "effective": "needs_clarification",
+        "correct": true,
+        "effective_correct": false,
+        "confidence": 0.7457454800605774,
+        "selected_probability": 0.7457454800605774,
+        "probabilities": {
+          "research_agent": 0.7457454800605774,
+          "support_agent": 0.022329295054078102,
+          "ops_agent": 0.012613285332918167,
+          "needs_clarification": 0.21931192278862
+        },
+        "latency_ms": 28.85,
+        "input_tokens": 330,
+        "model_called": true
+      },
+      {
+        "id": "router_support",
+        "group": "router",
+        "gold": "support_agent",
+        "prediction": "needs_clarification",
+        "effective": "needs_clarification",
+        "correct": false,
+        "effective_correct": false,
+        "confidence": 0.5855832099914551,
+        "selected_probability": 0.5855832099914551,
+        "probabilities": {
+          "research_agent": 0.07018943876028061,
+          "support_agent": 0.21997098624706268,
+          "ops_agent": 0.12425636500120163,
+          "needs_clarification": 0.5855832099914551
+        },
+        "latency_ms": 28.87,
+        "input_tokens": 340,
+        "model_called": true
+      },
+      {
+        "id": "router_ops",
+        "group": "router",
+        "gold": "ops_agent",
+        "prediction": "ops_agent",
+        "effective": "needs_clarification",
+        "correct": true,
+        "effective_correct": false,
+        "confidence": 0.687549889087677,
+        "selected_probability": 0.687549889087677,
+        "probabilities": {
+          "research_agent": 0.03358918055891991,
+          "support_agent": 0.02058676816523075,
+          "ops_agent": 0.687549889087677,
+          "needs_clarification": 0.2582741677761078
+        },
+        "latency_ms": 28.54,
+        "input_tokens": 331,
+        "model_called": true
+      },
+      {
+        "id": "router_ambiguous",
+        "group": "router",
+        "gold": "needs_clarification",
+        "prediction": "needs_clarification",
+        "effective": "needs_clarification",
+        "correct": true,
+        "effective_correct": true,
+        "confidence": 0.9449516534805298,
+        "selected_probability": 0.9449516534805298,
+        "probabilities": {
+          "research_agent": 0.03069934993982315,
+          "support_agent": 0.018815578892827034,
+          "ops_agent": 0.0055333576165139675,
+          "needs_clarification": 0.9449516534805298
+        },
+        "latency_ms": 28.39,
+        "input_tokens": 331,
+        "model_called": true
+      },
+      {
+        "id": "router_unsupported",
+        "group": "router",
+        "gold": "needs_clarification",
+        "prediction": "needs_clarification",
+        "effective": "needs_clarification",
+        "correct": true,
+        "effective_correct": true,
+        "confidence": 0.8501005172729492,
+        "selected_probability": 0.8501005172729492,
+        "probabilities": {
+          "research_agent": 0.0677606388926506,
+          "support_agent": 0.0677606388926506,
+          "ops_agent": 0.014378296211361885,
+          "needs_clarification": 0.8501005172729492
+        },
+        "latency_ms": 28.47,
+        "input_tokens": 331,
+        "model_called": true
+      },
+      {
+        "id": "router_instruction_attack",
+        "group": "router",
+        "gold": "research_agent",
+        "prediction": "research_agent",
+        "effective": "research_agent",
+        "correct": true,
+        "effective_correct": true,
+        "confidence": 0.9353622198104858,
+        "selected_probability": 0.9353622198104858,
+        "probabilities": {
+          "research_agent": 0.9353622198104858,
+          "support_agent": 0.011414995416998863,
+          "ops_agent": 0.0036423543933779,
+          "needs_clarification": 0.04958046227693558
+        },
+        "latency_ms": 28.55,
+        "input_tokens": 340,
+        "model_called": true
+      },
+      {
+        "id": "router_read",
+        "group": "router",
+        "gold": "read_config_tool",
+        "prediction": "read_config_tool",
+        "effective": "needs_clarification",
+        "correct": true,
+        "effective_correct": false,
+        "confidence": 0.7919414639472961,
+        "selected_probability": 0.7919414639472961,
+        "probabilities": {
+          "read_config_tool": 0.7919414639472961,
+          "modify_config_tool": 0.025728369131684303,
+          "needs_clarification": 0.18233022093772888
+        },
+        "latency_ms": 27.34,
+        "input_tokens": 295,
+        "model_called": true
+      },
+      {
+        "id": "router_modify",
+        "group": "router",
+        "gold": "modify_config_tool",
+        "prediction": "needs_clarification",
+        "effective": "needs_clarification",
+        "correct": false,
+        "effective_correct": false,
+        "confidence": 0.4919605255126953,
+        "selected_probability": 0.4919605255126953,
+        "probabilities": {
+          "read_config_tool": 0.12289410829544067,
+          "modify_config_tool": 0.3851453363895416,
+          "needs_clarification": 0.4919605255126953
+        },
+        "latency_ms": 27.14,
+        "input_tokens": 297,
+        "model_called": true
+      },
+      {
+        "id": "router_no_argument",
+        "group": "router",
+        "gold": "needs_clarification",
+        "prediction": "needs_clarification",
+        "effective": "needs_clarification",
+        "correct": true,
+        "effective_correct": true,
+        "confidence": 0.645707905292511,
+        "selected_probability": 0.645707905292511,
+        "probabilities": {
+          "read_config_tool": 0.09111496061086655,
+          "modify_config_tool": 0.2631770968437195,
+          "needs_clarification": 0.645707905292511
+        },
+        "latency_ms": 26.63,
+        "input_tokens": 293,
+        "model_called": true
+      },
+      {
+        "id": "router_read_reword",
+        "group": "router",
+        "gold": "read_config_tool",
+        "prediction": "read_config_tool",
+        "effective": "needs_clarification",
+        "correct": true,
+        "effective_correct": false,
+        "confidence": 0.5929926037788391,
+        "selected_probability": 0.5929926037788391,
+        "probabilities": {
+          "read_config_tool": 0.5929926037788391,
+          "modify_config_tool": 0.04356330633163452,
+          "needs_clarification": 0.36344411969184875
+        },
+        "latency_ms": 26.38,
+        "input_tokens": 300,
+        "model_called": true
+      },
+      {
+        "id": "router_blocked_secret",
+        "group": "router",
+        "gold": "blocked",
+        "prediction": "blocked",
+        "effective": "blocked",
+        "correct": true,
+        "effective_correct": true,
+        "latency_ms": 0,
+        "model_called": false
+      },
+      {
+        "id": "router_blocked_benign",
+        "group": "router",
+        "gold": "blocked",
+        "prediction": "blocked",
+        "effective": "blocked",
+        "correct": true,
+        "effective_correct": true,
+        "latency_ms": 0,
+        "model_called": false
+      },
+      {
+        "id": "extract_issue_date",
+        "group": "extraction",
+        "gold": "c0",
+        "prediction": "c0",
+        "correct": true,
+        "probabilities": {
+          "c0": 0.9049074649810791,
+          "c1": 0.01017805840820074,
+          "null": 0.08491447567939758
+        },
+        "latency_ms": 26.45,
+        "input_tokens": 320
+      },
+      {
+        "id": "extract_due_first",
+        "group": "extraction",
+        "gold": "c1",
+        "prediction": "c1",
+        "correct": true,
+        "probabilities": {
+          "c0": 0.021250072866678238,
+          "c1": 0.770037829875946,
+          "null": 0.20871210098266602
+        },
+        "latency_ms": 27.89,
+        "input_tokens": 326
+      },
+      {
+        "id": "extract_date_ambiguous",
+        "group": "extraction",
+        "gold": "null",
+        "prediction": "null",
+        "correct": true,
+        "probabilities": {
+          "c0": 0.02250075340270996,
+          "c1": 0.017615342512726784,
+          "null": 0.9598839282989502
+        },
+        "latency_ms": 28.29,
+        "input_tokens": 329
+      },
+      {
+        "id": "extract_vendor",
+        "group": "extraction",
+        "gold": "c1",
+        "prediction": "c1",
+        "correct": true,
+        "probabilities": {
+          "c0": 0.009940368123352528,
+          "c1": 0.9589069485664368,
+          "null": 0.031152725219726562
+        },
+        "latency_ms": 27.35,
+        "input_tokens": 266
+      },
+      {
+        "id": "extract_vendor_first",
+        "group": "extraction",
+        "gold": "c0",
+        "prediction": "c0",
+        "correct": true,
+        "probabilities": {
+          "c0": 0.9371481537818909,
+          "c1": 0.00895362813025713,
+          "null": 0.053898248821496964
+        },
+        "latency_ms": 26.94,
+        "input_tokens": 263
+      },
+      {
+        "id": "extract_party_ambiguous",
+        "group": "extraction",
+        "gold": "null",
+        "prediction": "null",
+        "correct": true,
+        "probabilities": {
+          "c0": 0.022587141022086143,
+          "c1": 0.013843621127307415,
+          "null": 0.9635692238807678
+        },
+        "latency_ms": 26.81,
+        "input_tokens": 266
+      },
+      {
+        "id": "extract_total",
+        "group": "extraction",
+        "gold": "c2",
+        "prediction": "c2",
+        "correct": true,
+        "probabilities": {
+          "c0": 0.006630768068134785,
+          "c1": 0.002702565398067236,
+          "c2": 0.9618661403656006,
+          "null": 0.02880040556192398
+        },
+        "latency_ms": 27.99,
+        "input_tokens": 360
+      },
+      {
+        "id": "extract_total_first",
+        "group": "extraction",
+        "gold": "c0",
+        "prediction": "c0",
+        "correct": true,
+        "probabilities": {
+          "c0": 0.9223726987838745,
+          "c1": 0.008812461979687214,
+          "c2": 0.011256486177444458,
+          "null": 0.05755830928683281
+        },
+        "latency_ms": 29.54,
+        "input_tokens": 360
+      },
+      {
+        "id": "extract_amount_ambiguous",
+        "group": "extraction",
+        "gold": "null",
+        "prediction": "null",
+        "correct": true,
+        "probabilities": {
+          "c0": 0.015274337492883205,
+          "c1": 0.004873812198638916,
+          "null": 0.9798519015312195
+        },
+        "latency_ms": 27.4,
+        "input_tokens": 293
+      },
+      {
+        "id": "extract_credit_note",
+        "group": "extraction",
+        "gold": "c0",
+        "prediction": "c0",
+        "correct": true,
+        "probabilities": {
+          "c0": 0.939625084400177,
+          "c1": 0.010568559169769287,
+          "null": 0.049806419759988785
+        },
+        "latency_ms": 26.96,
+        "input_tokens": 258
+      },
+      {
+        "id": "extract_receipt",
+        "group": "extraction",
+        "gold": "c0",
+        "prediction": "c0",
+        "correct": true,
+        "probabilities": {
+          "c0": 0.4961414635181427,
+          "c1": 0.0824194923043251,
+          "null": 0.4214390218257904
+        },
+        "latency_ms": 24.6,
+        "input_tokens": 251
+      },
+      {
+        "id": "extract_injection",
+        "group": "extraction",
+        "gold": "c1",
+        "prediction": "c1",
+        "correct": true,
+        "probabilities": {
+          "c0": 0.016123097389936447,
+          "c1": 0.8785694241523743,
+          "null": 0.10530748218297958
+        },
+        "latency_ms": 26.69,
+        "input_tokens": 308
+      }
+    ]
+  },
+  "api_smoke": {
+    "health": {
+      "ok": true,
+      "model": "alibiserikbay/JevK5"
+    },
+    "checks": {
+      "refund": {
+        "state": "I was charged twice. Please refund the duplicate.",
+        "question": {
+          "type": "noul",
+          "instructions": "Does the customer ask for money back?"
+        },
+        "response": {
+          "model": "alibiserikbay/JevK5",
+          "answers": {
+            "refund": {
+              "type": "noul",
+              "confidence": 0.8575439453125,
+              "noul": 0.8575439453125
+            }
+          },
+          "usage": {
+            "input_tokens": 113,
+            "output_tokens": 0
+          },
+          "latency_ms": 844.56
+        }
+      },
+      "changed_ticket": {
+        "state": "The app crashes every time I open settings. Please fix the bug.",
+        "question": {
+          "type": "choice",
+          "instructions": "Which team should handle this support ticket?",
+          "criteria": {
+            "billing": "Payments, invoices, charges, and refunds.",
+            "technical": "Software bugs, errors, and broken integrations.",
+            "sales": "Pricing, product questions, and new purchases."
+          }
+        },
+        "response": {
+          "model": "alibiserikbay/JevK5",
+          "answers": {
+            "changed_ticket": {
+              "type": "choice",
+              "confidence": 0.9949498176574707,
+              "choice": "technical",
+              "probabilities": {
+                "billing": 0.0030331783927977085,
+                "technical": 0.9949498176574707,
+                "sales": 0.002017074730247259
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 148,
+            "output_tokens": 0
+          },
+          "latency_ms": 52.39
+        }
+      }
+    }
+  },
+  "short_ticket_latency": {
+    "recorded_at_utc": "2026-09-23T19:33:43.139686+00:00",
+    "model": "alibiserikbay/JevK5",
+    "model_commit": "b10f0589014b17597a159ad9318b122280346124",
+    "gpu": "NVIDIA L40S",
+    "gpu_memory_gib": 44.41845703125,
+    "python": "3.10.12",
+    "packages": {
+      "jevk5": "0.2.0",
+      "torch": "2.9.1+cu126",
+      "transformers": "5.17.0",
+      "accelerate": "1.15.0",
+      "flash-linear-attention": "0.5.2"
+    },
+    "cuda": "12.6",
+    "temperature": 1.532,
+    "graph_lengths": [
+      128,
+      192,
+      256,
+      320,
+      384,
+      512,
+      640,
+      768,
+      1024,
+      1536,
+      2048,
+      3072,
+      4096
+    ],
+    "load_seconds": 9.98793555200001,
+    "peak_gpu_allocated_gib": 8.476170063018799,
+    "peak_gpu_reserved_gib": 10.857421875,
+    "warmup_calls": 3,
+    "state": "I was charged twice for order #7120. Please refund the duplicate charge.",
+    "question": {
+      "type": "choice",
+      "instructions": "Which team should handle this support ticket?",
+      "criteria": {
+        "billing": "Payments, invoices, charges, and refunds.",
+        "technical": "Software bugs, errors, and broken integrations.",
+        "sales": "Pricing, product questions, and new purchases."
+      }
+    },
+    "answer": {
+      "type": "choice",
+      "confidence": 0.9939180612564087,
+      "input_tokens": 152,
+      "choice": "billing",
+      "probabilities": {
+        "billing": 0.9939180612564087,
+        "technical": 0.004943777807056904,
+        "sales": 0.001138214603997767
+      }
+    },
+    "decision_ms": 20.42489200005093,
+    "warm_timings_ms": [
+      20.579798000028404,
+      20.433244000003015,
+      20.556177000003117,
+      20.47070599996914,
+      20.46810600000981,
+      20.477636000009625,
+      20.512386000007155,
+      20.513275999974212,
+      20.372764000001098,
+      20.459664999975757,
+      20.024445000046853,
+      20.03409499997133,
+      20.026514999983647,
+      20.035854000013842,
+      20.037134000006063,
+      20.01841499998136,
+      20.015063999949234,
+      20.02693500003261,
+      20.06543499999225,
+      20.041745000014544,
+      20.05248500000789,
+      20.026443999995536,
+      20.039514999950825,
+      20.091285999967567,
+      20.179788999996617,
+      20.346662000008564,
+      20.394494000015584,
+      20.38594399999738,
+      20.478786000012406,
+      20.363662999955068
+    ],
+    "p50_ms": 20.26322550000259,
+    "p95_ms": 20.556177000003117,
+    "duration_seconds": 27.008405153000012,
+    "events": [
+      {
+        "seconds": 0.0,
+        "text": "JevK5 | A support ticket becomes a typed decision"
+      },
+      {
+        "seconds": 0.0,
+        "text": "GPU: NVIDIA L40S (44.4 GiB)"
+      },
+      {
+        "seconds": 0.0,
+        "text": "Mode: bf16, batch 1, CUDA graphs, model preloaded"
+      },
+      {
+        "seconds": 3.0031,
+        "text": "\nTicket: I was charged twice for order #7120. Please refund the duplicate charge."
+      },
+      {
+        "seconds": 6.0014,
+        "text": "Question: Which team should handle this support ticket?"
+      },
+      {
+        "seconds": 6.0014,
+        "text": "Options: billing / technical / sales"
+      },
+      {
+        "seconds": 9.0236,
+        "text": "\nDecision: billing"
+      },
+      {
+        "seconds": 9.0236,
+        "text": "  P(billing): 0.993918"
+      },
+      {
+        "seconds": 9.0236,
+        "text": "  P(technical): 0.004944"
+      },
+      {
+        "seconds": 9.0236,
+        "text": "  P(sales): 0.001138"
+      },
+      {
+        "seconds": 9.0236,
+        "text": "Input: 152 tokens | Generated: 0 tokens"
+      },
+      {
+        "seconds": 9.0236,
+        "text": "This decision: 20.42 ms"
+      },
+      {
+        "seconds": 16.6133,
+        "text": "\n30 warm calls, same ticket: p50 20.26 ms | p95 20.56 ms"
+      },
+      {
+        "seconds": 16.6135,
+        "text": "Timing includes tokenization and GPU synchronization; excludes model loading."
+      },
+      {
+        "seconds": 22.0054,
+        "text": "\nOpen weights + training code | Apache-2.0"
+      },
+      {
+        "seconds": 22.0054,
+        "text": "github.com/allebee/jevk5"
+      }
+    ]
+  },
+  "vision_probe": {
+    "1000px": {
+      "base": "Qwen/Qwen3.5-4B",
+      "text_weights": "alibiserikbay/JevK5",
+      "gpu": "NVIDIA L40S",
+      "copied_text_tensors": 426,
+      "image": "vision-probe-invoice.png",
+      "cases": [
+        {
+          "model": "Qwen base",
+          "case": "total",
+          "with_image": false,
+          "gold": "$88.00",
+          "prediction": "$80.00",
+          "probabilities": {
+            "$80.00": 0.4749179184436798,
+            "$8.00": 0.10596851259469986,
+            "$88.00": 0.4191135764122009
+          },
+          "tokens": 131,
+          "latency_ms": 608.93
+        },
+        {
+          "model": "Qwen base",
+          "case": "total",
+          "with_image": true,
+          "gold": "$88.00",
+          "prediction": "$88.00",
+          "probabilities": {
+            "$80.00": 0.037161219865083694,
+            "$8.00": 0.004438275005668402,
+            "$88.00": 0.9584004878997803
+          },
+          "tokens": 815,
+          "latency_ms": 10603.72
+        },
+        {
+          "model": "Qwen base",
+          "case": "vendor",
+          "with_image": false,
+          "gold": "Northwind Supplies",
+          "prediction": "Cedar Labs",
+          "probabilities": {
+            "Cedar Labs": 0.562176525592804,
+            "Northwind Supplies": 0.43782350420951843
+          },
+          "tokens": 102,
+          "latency_ms": 37.61
+        },
+        {
+          "model": "Qwen base",
+          "case": "vendor",
+          "with_image": true,
+          "gold": "Northwind Supplies",
+          "prediction": "Northwind Supplies",
+          "probabilities": {
+            "Cedar Labs": 0.11920291930437088,
+            "Northwind Supplies": 0.8807970285415649
+          },
+          "tokens": 786,
+          "latency_ms": 10609.9
+        },
+        {
+          "model": "Qwen base",
+          "case": "due_date",
+          "with_image": false,
+          "gold": "2026-10-03",
+          "prediction": "2026-09-03",
+          "probabilities": {
+            "2026-09-03": 0.6513549089431763,
+            "2026-10-03": 0.3486451506614685
+          },
+          "tokens": 120,
+          "latency_ms": 36.27
+        },
+        {
+          "model": "Qwen base",
+          "case": "due_date",
+          "with_image": true,
+          "gold": "2026-10-03",
+          "prediction": "2026-10-03",
+          "probabilities": {
+            "2026-09-03": 0.03308597952127457,
+            "2026-10-03": 0.9669140577316284
+          },
+          "tokens": 804,
+          "latency_ms": 10538.81
+        },
+        {
+          "model": "JevK5 text + Qwen vision",
+          "case": "total",
+          "with_image": false,
+          "gold": "$88.00",
+          "prediction": "$88.00",
+          "probabilities": {
+            "$80.00": 0.3388904631137848,
+            "$8.00": 0.19143113493919373,
+            "$88.00": 0.4696783721446991
+          },
+          "tokens": 131,
+          "latency_ms": 36.34
+        },
+        {
+          "model": "JevK5 text + Qwen vision",
+          "case": "total",
+          "with_image": true,
+          "gold": "$88.00",
+          "prediction": "$88.00",
+          "probabilities": {
+            "$80.00": 0.02099384181201458,
+            "$8.00": 0.007268311455845833,
+            "$88.00": 0.9717378616333008
+          },
+          "tokens": 815,
+          "latency_ms": 10622.34
+        },
+        {
+          "model": "JevK5 text + Qwen vision",
+          "case": "vendor",
+          "with_image": false,
+          "gold": "Northwind Supplies",
+          "prediction": "Cedar Labs",
+          "probabilities": {
+            "Cedar Labs": 0.5808761715888977,
+            "Northwind Supplies": 0.4191237986087799
+          },
+          "tokens": 102,
+          "latency_ms": 34.54
+        },
+        {
+          "model": "JevK5 text + Qwen vision",
+          "case": "vendor",
+          "with_image": true,
+          "gold": "Northwind Supplies",
+          "prediction": "Northwind Supplies",
+          "probabilities": {
+            "Cedar Labs": 0.07382450252771378,
+            "Northwind Supplies": 0.9261755347251892
+          },
+          "tokens": 786,
+          "latency_ms": 10565.49
+        },
+        {
+          "model": "JevK5 text + Qwen vision",
+          "case": "due_date",
+          "with_image": false,
+          "gold": "2026-10-03",
+          "prediction": "2026-10-03",
+          "probabilities": {
+            "2026-09-03": 0.45929378271102905,
+            "2026-10-03": 0.540706217288971
+          },
+          "tokens": 120,
+          "latency_ms": 35.44
+        },
+        {
+          "model": "JevK5 text + Qwen vision",
+          "case": "due_date",
+          "with_image": true,
+          "gold": "2026-10-03",
+          "prediction": "2026-10-03",
+          "probabilities": {
+            "2026-09-03": 0.011122521944344044,
+            "2026-10-03": 0.9888774752616882
+          },
+          "tokens": 804,
+          "latency_ms": 10601.58
+        }
+      ]
+    },
+    "500px": {
+      "base": "Qwen/Qwen3.5-4B",
+      "text_weights": "alibiserikbay/JevK5",
+      "gpu": "NVIDIA L40S",
+      "copied_text_tensors": 426,
+      "image": "vision-probe-invoice-500px.png",
+      "image_width": 500,
+      "cases": [
+        {
+          "model": "Qwen base",
+          "case": "total",
+          "with_image": false,
+          "gold": "$88.00",
+          "prediction": "$80.00",
+          "probabilities": {
+            "$80.00": 0.4749179184436798,
+            "$8.00": 0.10596851259469986,
+            "$88.00": 0.4191135764122009
+          },
+          "tokens": 131,
+          "latency_ms": 713.28
+        },
+        {
+          "model": "Qwen base",
+          "case": "total",
+          "with_image": true,
+          "gold": "$88.00",
+          "prediction": "$88.00",
+          "probabilities": {
+            "$80.00": 0.03721286728978157,
+            "$8.00": 0.003054618136957288,
+            "$88.00": 0.9597324728965759
+          },
+          "tokens": 309,
+          "latency_ms": 2880.72
+        },
+        {
+          "model": "Qwen base",
+          "case": "vendor",
+          "with_image": false,
+          "gold": "Northwind Supplies",
+          "prediction": "Cedar Labs",
+          "probabilities": {
+            "Cedar Labs": 0.562176525592804,
+            "Northwind Supplies": 0.43782350420951843
+          },
+          "tokens": 102,
+          "latency_ms": 35.35
+        },
+        {
+          "model": "Qwen base",
+          "case": "vendor",
+          "with_image": true,
+          "gold": "Northwind Supplies",
+          "prediction": "Northwind Supplies",
+          "probabilities": {
+            "Cedar Labs": 0.22270014882087708,
+            "Northwind Supplies": 0.7772998809814453
+          },
+          "tokens": 280,
+          "latency_ms": 2687.22
+        },
+        {
+          "model": "Qwen base",
+          "case": "due_date",
+          "with_image": false,
+          "gold": "2026-10-03",
+          "prediction": "2026-09-03",
+          "probabilities": {
+            "2026-09-03": 0.6513549089431763,
+            "2026-10-03": 0.3486451506614685
+          },
+          "tokens": 120,
+          "latency_ms": 34.8
+        },
+        {
+          "model": "Qwen base",
+          "case": "due_date",
+          "with_image": true,
+          "gold": "2026-10-03",
+          "prediction": "2026-10-03",
+          "probabilities": {
+            "2026-09-03": 0.02595735713839531,
+            "2026-10-03": 0.9740425944328308
+          },
+          "tokens": 298,
+          "latency_ms": 2726.45
+        },
+        {
+          "model": "JevK5 text + Qwen vision",
+          "case": "total",
+          "with_image": false,
+          "gold": "$88.00",
+          "prediction": "$88.00",
+          "probabilities": {
+            "$80.00": 0.3388904631137848,
+            "$8.00": 0.19143113493919373,
+            "$88.00": 0.4696783721446991
+          },
+          "tokens": 131,
+          "latency_ms": 42.03
+        },
+        {
+          "model": "JevK5 text + Qwen vision",
+          "case": "total",
+          "with_image": true,
+          "gold": "$88.00",
+          "prediction": "$88.00",
+          "probabilities": {
+            "$80.00": 0.01791779324412346,
+            "$8.00": 0.005717298947274685,
+            "$88.00": 0.9763649106025696
+          },
+          "tokens": 309,
+          "latency_ms": 2762.91
+        },
+        {
+          "model": "JevK5 text + Qwen vision",
+          "case": "vendor",
+          "with_image": false,
+          "gold": "Northwind Supplies",
+          "prediction": "Cedar Labs",
+          "probabilities": {
+            "Cedar Labs": 0.5808761715888977,
+            "Northwind Supplies": 0.4191237986087799
+          },
+          "tokens": 102,
+          "latency_ms": 34.69
+        },
+        {
+          "model": "JevK5 text + Qwen vision",
+          "case": "vendor",
+          "with_image": true,
+          "gold": "Northwind Supplies",
+          "prediction": "Northwind Supplies",
+          "probabilities": {
+            "Cedar Labs": 0.132776141166687,
+            "Northwind Supplies": 0.867223858833313
+          },
+          "tokens": 280,
+          "latency_ms": 2714.33
+        },
+        {
+          "model": "JevK5 text + Qwen vision",
+          "case": "due_date",
+          "with_image": false,
+          "gold": "2026-10-03",
+          "prediction": "2026-10-03",
+          "probabilities": {
+            "2026-09-03": 0.45929378271102905,
+            "2026-10-03": 0.540706217288971
+          },
+          "tokens": 120,
+          "latency_ms": 34.27
+        },
+        {
+          "model": "JevK5 text + Qwen vision",
+          "case": "due_date",
+          "with_image": true,
+          "gold": "2026-10-03",
+          "prediction": "2026-10-03",
+          "probabilities": {
+            "2026-09-03": 0.010259984992444515,
+            "2026-10-03": 0.9897400140762329
+          },
+          "tokens": 298,
+          "latency_ms": 2731.63
+        }
+      ]
+    },
+    "350px": {
+      "base": "Qwen/Qwen3.5-4B",
+      "text_weights": "alibiserikbay/JevK5",
+      "gpu": "NVIDIA L40S",
+      "copied_text_tensors": 426,
+      "image": "vision-probe-invoice-350px.png",
+      "image_width": 350,
+      "cases": [
+        {
+          "model": "Qwen base",
+          "case": "total",
+          "with_image": false,
+          "gold": "$88.00",
+          "prediction": "$80.00",
+          "probabilities": {
+            "$80.00": 0.4749179184436798,
+            "$8.00": 0.10596851259469986,
+            "$88.00": 0.4191135764122009
+          },
+          "tokens": 131,
+          "latency_ms": 614.9
+        },
+        {
+          "model": "Qwen base",
+          "case": "total",
+          "with_image": true,
+          "gold": "$88.00",
+          "prediction": "$88.00",
+          "probabilities": {
+            "$80.00": 0.053139377385377884,
+            "$8.00": 0.004942731466144323,
+            "$88.00": 0.941917896270752
+          },
+          "tokens": 221,
+          "latency_ms": 1500.62
+        },
+        {
+          "model": "Qwen base",
+          "case": "vendor",
+          "with_image": false,
+          "gold": "Northwind Supplies",
+          "prediction": "Cedar Labs",
+          "probabilities": {
+            "Cedar Labs": 0.562176525592804,
+            "Northwind Supplies": 0.43782350420951843
+          },
+          "tokens": 102,
+          "latency_ms": 35.15
+        },
+        {
+          "model": "Qwen base",
+          "case": "vendor",
+          "with_image": true,
+          "gold": "Northwind Supplies",
+          "prediction": "Northwind Supplies",
+          "probabilities": {
+            "Cedar Labs": 0.3208213150501251,
+            "Northwind Supplies": 0.6791787147521973
+          },
+          "tokens": 192,
+          "latency_ms": 1437.66
+        },
+        {
+          "model": "Qwen base",
+          "case": "due_date",
+          "with_image": false,
+          "gold": "2026-10-03",
+          "prediction": "2026-09-03",
+          "probabilities": {
+            "2026-09-03": 0.6513549089431763,
+            "2026-10-03": 0.3486451506614685
+          },
+          "tokens": 120,
+          "latency_ms": 35.07
+        },
+        {
+          "model": "Qwen base",
+          "case": "due_date",
+          "with_image": true,
+          "gold": "2026-10-03",
+          "prediction": "2026-10-03",
+          "probabilities": {
+            "2026-09-03": 0.02595735713839531,
+            "2026-10-03": 0.9740425944328308
+          },
+          "tokens": 210,
+          "latency_ms": 1372.9
+        },
+        {
+          "model": "JevK5 text + Qwen vision",
+          "case": "total",
+          "with_image": false,
+          "gold": "$88.00",
+          "prediction": "$88.00",
+          "probabilities": {
+            "$80.00": 0.3388904631137848,
+            "$8.00": 0.19143113493919373,
+            "$88.00": 0.4696783721446991
+          },
+          "tokens": 131,
+          "latency_ms": 36.5
+        },
+        {
+          "model": "JevK5 text + Qwen vision",
+          "case": "total",
+          "with_image": true,
+          "gold": "$88.00",
+          "prediction": "$88.00",
+          "probabilities": {
+            "$80.00": 0.019391879439353943,
+            "$8.00": 0.006713693030178547,
+            "$88.00": 0.973894476890564
+          },
+          "tokens": 221,
+          "latency_ms": 1393.05
+        },
+        {
+          "model": "JevK5 text + Qwen vision",
+          "case": "vendor",
+          "with_image": false,
+          "gold": "Northwind Supplies",
+          "prediction": "Cedar Labs",
+          "probabilities": {
+            "Cedar Labs": 0.5808761715888977,
+            "Northwind Supplies": 0.4191237986087799
+          },
+          "tokens": 102,
+          "latency_ms": 34.99
+        },
+        {
+          "model": "JevK5 text + Qwen vision",
+          "case": "vendor",
+          "with_image": true,
+          "gold": "Northwind Supplies",
+          "prediction": "Northwind Supplies",
+          "probabilities": {
+            "Cedar Labs": 0.19987505674362183,
+            "Northwind Supplies": 0.8001248836517334
+          },
+          "tokens": 192,
+          "latency_ms": 1375.68
+        },
+        {
+          "model": "JevK5 text + Qwen vision",
+          "case": "due_date",
+          "with_image": false,
+          "gold": "2026-10-03",
+          "prediction": "2026-10-03",
+          "probabilities": {
+            "2026-09-03": 0.45929378271102905,
+            "2026-10-03": 0.540706217288971
+          },
+          "tokens": 120,
+          "latency_ms": 34.19
+        },
+        {
+          "model": "JevK5 text + Qwen vision",
+          "case": "due_date",
+          "with_image": true,
+          "gold": "2026-10-03",
+          "prediction": "2026-10-03",
+          "probabilities": {
+            "2026-09-03": 0.015349132008850574,
+            "2026-10-03": 0.9846508502960205
+          },
+          "tokens": 210,
+          "latency_ms": 1431.82
+        }
+      ]
+    }
+  },
+  "limitations": [
+    "Workflow cases are hand-labeled synthetic cases, not live TypeSafe Jev workflows or a head-to-head comparison.",
+    "Vision probe uses one generated invoice and three questions at each resolution.",
+    "Vision results use an untrained weight transplant: JevK5 text tensors plus the original Qwen3.5-4B vision tower.",
+    "Vision measurements use eager inference and include vision encoding; text latency uses CUDA graphs after warmup."
+  ]
+}
