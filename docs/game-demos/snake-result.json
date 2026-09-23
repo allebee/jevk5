@@ -1,0 +1,44 @@
+{
+  "recorded_at": "2026-09-23T17:21:38.787Z",
+  "seed": 2026,
+  "pace_px_per_sec": 150,
+  "duration_sec": 24,
+  "round_sec": 24,
+  "edges": "wrap",
+  "sides": [
+    {
+      "side": 1,
+      "model": "jevk5",
+      "requested_model": "jevk5",
+      "score": 70,
+      "apples": 7,
+      "length_nodes": 103,
+      "survived_sec": 24,
+      "death": null,
+      "decisions": 100,
+      "decisions_per_sec": 4.16,
+      "latency_p50_ms": 463,
+      "latency_p95_ms": 794,
+      "input_tokens": 85402,
+      "output_tokens": 0,
+      "error": null
+    },
+    {
+      "side": 2,
+      "model": "seeded_random",
+      "requested_model": "random",
+      "score": 30,
+      "apples": 3,
+      "length_nodes": 71,
+      "survived_sec": 24,
+      "death": null,
+      "decisions": 175,
+      "decisions_per_sec": 7.26,
+      "latency_p50_ms": 387,
+      "latency_p95_ms": 602,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": null
+    }
+  ]
+}

@@ -1,10 +1,56 @@
 # JevK5
 
-**An open decision model: typed answers with calibrated probabilities, in one forward pass.**
+**Open 4B weights. A document in, a typed decision and probabilities out.**
 
-Give it a state (a ticket, a log, a policy, a diff) and typed questions: yes/no, choice, or score.
-It returns a probability for every option, with zero generated tokens, in about 13 ms on one
-GPU. It answers TypeSafe's `/v1/systemone` shape, so Jev-style clients can point at it.
+Route tickets, check policies, or score options in one forward pass with zero generated tokens.
+**#2 of 76 on [JevBench v1.4](https://benchmarkheaven.com/jev-models)** · Apache-2.0 ·
+[Weights](https://huggingface.co/alibiserikbay/JevK5)
+
+**Hardware:** Linux, Python 3.10+, NVIDIA GPU with bf16 support (Ampere or newer).
+Start with **16 GB VRAM**; tested on an L40S, with 10.86 GiB peak PyTorch reserved memory.
+Allow about 25 GB disk space. [Fresh-server setup and troubleshooting →](docs/first-run.md)
+
+In an activated virtual environment with compatible CUDA PyTorch installed:
+
+```bash
+python -m pip install "jevk5[fast] @ git+https://github.com/allebee/jevk5@v0.2.0"
+```
+
+```python
+from jevk5 import JevK5
+
+model = JevK5()  # Downloads weights and prepares CUDA graphs on first use.
+answer = model.decide(
+    "I was charged twice for order #7120. Please refund the duplicate charge.",
+    {"type": "choice", "instructions": "Which team should handle this support ticket?",
+     "criteria": {"billing": "Payments, invoices, charges, and refunds.",
+                  "technical": "Software bugs, errors, and broken integrations.",
+                  "sales": "Pricing, product questions, and new purchases."}},
+)
+print(answer["choice"], answer["probabilities"])
+```
+
+Actual output, probabilities rounded:
+
+```text
+billing {'billing': 0.993918, 'technical': 0.004944, 'sales': 0.001138}
+```
+
+**[Watch the 27-second NVIDIA demo](docs/demo/jevk5-nvidia-demo.mp4)** ·
+[Watch Snake, Tetris, and Kombat](docs/game-demos/README.md) ·
+[Run the timed example](examples/quickstart.py) · [Raw measurements](docs/demo/l40s-run.json)
+
+Measured on an **NVIDIA L40S**: **20.49 ms p50 / 20.89 ms p95**, 30 warm calls on this
+152-token ticket, batch 1, bf16, CUDA graphs. Includes tokenization and GPU synchronization;
+excludes model loading, network transport, and the demo's reading pauses. The video replays
+actual timestamped GPU output. This is one example, not a benchmark-wide latency claim.
+
+**[Outside JevBench: public Jev use-case tests](docs/jev-usecases/README.md).** On 36 small cases
+adapted from browser actions, tool routing, and document extraction, JevK5 chose the expected
+answer in 33. The router's 0.85 confidence gate passed only 1 of 7 actionable requests, so
+this is not yet a drop-in result for that workflow. These are local cases, not a Jev head-to-head.
+
+## JevBench result
 
 **[JevBench v1.4](https://benchmarkheaven.com/jev-models) ranks JevK5 v0.2 second of 76 systems**,
 behind Jev 1.13.0 (63.29 against 62.04) and ahead of every other open system. Judge tier 0.945,
@@ -54,23 +100,10 @@ and dates and numbers 0.40 -> 0.47; judging answers slips 0.82 -> 0.76 (one item
 after training (an unchanged policy pair); the temperature is fitted on hard questions, so
 standard-tier confidence is now too low (ECE 0.141 there, against 0.066 on the hard tier).
 
-## Install and use
+## More ways to use it
 
-```bash
-pip install "jevk5[fast] @ git+https://github.com/allebee/jevk5@v0.2.0"
-```
-
-```python
-from jevk5 import JevK5
-
-model = JevK5("alibiserikbay/JevK5")          # ~9 GB of GPU memory in bf16
-model.decide(
-    "Refunds need a receipt and a purchase within 30 days. "
-    "The customer bought 12 days ago and has no receipt.",
-    {"type": "noul", "instructions": "Is a refund permitted under the policy?"},
-)
-# {'type': 'noul', 'confidence': ..., 'noul': <probability of true>, 'input_tokens': ...}
-```
+Keep the same `model` object loaded for subsequent decisions. See the
+[first-run guide](docs/first-run.md) for a tested CUDA install and the HTTP interface.
 
 Question types: `noul` (yes/no, optional `criteria` {"true": ..., "false": ...}), `choice`
 (`criteria` {key: description} or a list of keys), `score` (`criteria` a list of level
@@ -80,7 +113,7 @@ As a server:
 
 ```bash
 jevk5-serve --model alibiserikbay/JevK5 --port 8090
-curl -s localhost:8090/v1/systemone -d '{"state": "Order #7120 shows delivered to No. 17; the customer lives at No. 71.",
+curl --fail localhost:8090/v1/systemone -H 'Content-Type: application/json' -d '{"state": "Order #7120 shows delivered to No. 17; the customer lives at No. 71.",
   "questions": {"what": {"type": "choice", "instructions": "What happened to the parcel?",
                          "criteria": ["delivered", "misdelivered", "unknown"]}}}'
 ```
@@ -108,6 +141,10 @@ linear-attention layers fall back to transformers' PyTorch code.
 No JevBench item and no output of Jev was used for training, tuning or model selection (with one correction, see [CHANGELOG](CHANGELOG.md)).
 
 ## It also plays Tetris, badly and well
+
+**[Watch the NVIDIA game demos](docs/game-demos/README.md):** 15 Tetris lines in one
+77-piece run; 7 apples to a seeded random player's 3 in Snake; and a fight that
+exposes a weakness, with no JevK5 hit landed. These games are not Jev matchups.
 
 [`examples/tetris.py`](examples/tetris.py) turns Tetris into typed decisions. Reading the board as
 characters, JevK5 plays at random: 0.0 lines a game, topping out after 26 pieces, usually taking the

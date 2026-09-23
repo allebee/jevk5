@@ -1,0 +1,62 @@
+{
+  "health": {
+    "ok": true,
+    "model": "alibiserikbay/JevK5"
+  },
+  "checks": {
+    "refund": {
+      "state": "I was charged twice. Please refund the duplicate.",
+      "question": {
+        "type": "noul",
+        "instructions": "Does the customer ask for money back?"
+      },
+      "response": {
+        "model": "alibiserikbay/JevK5",
+        "answers": {
+          "refund": {
+            "type": "noul",
+            "confidence": 0.8575439453125,
+            "noul": 0.8575439453125
+          }
+        },
+        "usage": {
+          "input_tokens": 113,
+          "output_tokens": 0
+        },
+        "latency_ms": 804.76
+      }
+    },
+    "changed_ticket": {
+      "state": "The app crashes every time I open settings. Please fix the bug.",
+      "question": {
+        "type": "choice",
+        "instructions": "Which team should handle this support ticket?",
+        "criteria": {
+          "billing": "Payments, invoices, charges, and refunds.",
+          "technical": "Software bugs, errors, and broken integrations.",
+          "sales": "Pricing, product questions, and new purchases."
+        }
+      },
+      "response": {
+        "model": "alibiserikbay/JevK5",
+        "answers": {
+          "changed_ticket": {
+            "type": "choice",
+            "confidence": 0.9949498176574707,
+            "choice": "technical",
+            "probabilities": {
+              "billing": 0.0030331783927977085,
+              "technical": 0.9949498176574707,
+              "sales": 0.002017074730247259
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 148,
+          "output_tokens": 0
+        },
+        "latency_ms": 47.76
+      }
+    }
+  }
+}
