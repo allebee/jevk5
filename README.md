@@ -13,6 +13,12 @@ their own hardware, not by us.
 
 ![JevBench v1.4: JevK5 is second of 76](docs/jevbench-v1.4.png)
 
+**Watch JevK5 work:** [typed decision and probabilities on an NVIDIA L40S (27 seconds)](docs/demo/jevk5-nvidia-demo.mp4)
+· [Snake game against seeded random (24 seconds)](docs/game-demos/snake.mp4).
+The first video is a paced replay of a real GPU run; its displayed decision took 20.60 ms after
+model loading. The second is a live capture using [Prompt Engineer 48's MIT-licensed arena](https://github.com/PromptEngineer48/laya-vs-jev-arena):
+JevK5 collected 7 apples to random's 3. The game is not a Jev comparison.
+
 | | |
 |---|---|
 | Weights | [alibiserikbay/JevK5](https://huggingface.co/alibiserikbay/JevK5): Qwen3.5-4B + a distilled LoRA, merged (Apache-2.0) |
