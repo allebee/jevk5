@@ -2,7 +2,14 @@
 
 Realistic documents with the deciding detail buried in them: policies with exceptions, date and
 number arithmetic, multi-step lookups, judging answers, ambiguity, misleading notes, and exact
-probabilities. Each answer was worked out by hand. Used only to fit softmax temperatures.
+probabilities. Each answer was worked out by hand. Used only to check softmax temperatures, never
+trained on.
+
+Two pieces of wording here used to echo JevBench's public hard items - one generic judge
+instruction that matched eight of them, and one date item whose rule read almost like a public
+one's. Both were rewritten on 2026-09-23 after JevBench's own scan flagged the instruction; see
+CHANGELOG.md. Nothing here has ever been training data, and `python - <<"from training import
+hard_dev_items"` plus an 8-word-sequence scan against the public items now comes back empty.
 
     python experiments/hard_dev_items.py > data/calib/hard_dev.jsonl
 """
@@ -18,7 +25,7 @@ def choice(instructions, options):
     return {"type": "choice", "instructions": instructions, "criteria": options}
 
 
-JUDGE_Q = ("Does the response fully and correctly satisfy the request?", "Correct, complete and follows every constraint", "Wrong, incomplete or violates a constraint")
+JUDGE_Q = ("Is the reply right, and does it do everything that was asked?", "Correct, complete and follows every constraint", "Wrong, incomplete or violates a constraint")
 
 ITEMS = [
     # ---- policies with exceptions ----
@@ -102,10 +109,10 @@ Start date: 12 March 2026. Notice received: 6 September 2026.""",
 Resolution target: 3 business days after the ticket is opened (the opening day is not counted). Business days are Monday to Friday except public holidays.
 Ticket opened: Thursday 24 December 2026, 16:00. Public holidays: 25 and 28 December 2026.""",
      choice("What is the resolution deadline?", {"2026-12-29": "29 December 2026", "2026-12-30": "30 December 2026", "2026-12-31": "31 December 2026", "2027-01-04": "4 January 2027"}), "2026-12-31"),
-    ("temporal", """EXTENDED WARRANTY
-Cover starts on the delivery date and ends 18 months later. If the end month has no day with the same number as the delivery day, cover ends on the last day of that month.
-Delivery date: 31 August 2025.""",
-     choice("On what date does cover end?", {"2027-02-28": "28 February 2027", "2027-03-01": "1 March 2027", "2027-02-27": "27 February 2027", "2027-03-03": "3 March 2027"}), "2027-02-28"),
+    ("temporal", """MEMBERSHIP TERMS
+A membership runs 30 calendar months from its activation day. Where the closing month is too short to hold that day number, membership lapses on that month's final day.
+Activated: 31 December 2024.""",
+     choice("When does the membership lapse?", {"2027-06-30": "30 June 2027", "2027-07-01": "1 July 2027", "2027-06-29": "29 June 2027", "2027-07-31": "31 July 2027"}), "2027-06-30"),
     ("temporal", """PARKING PERMIT
 The permit is valid for 90 days including the day of issue.
 Issued: 10 June 2026. Car checked on: 7 September 2026.""",

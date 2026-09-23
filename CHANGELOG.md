@@ -1,5 +1,20 @@
 # Changelog
 
+## Correction, 2026-09-23
+
+JevBench's v1.4 scan noted that our hand-written calibration set
+(`training/hard_dev_items.py`, 65 items) used one generic judge instruction that also appears in
+eight public hard items. Our own 8-word-sequence scan then found a second echo we had missed: one
+date item whose rule wording followed a public item's closely. Both are rewritten; the scan over
+every published file now returns nothing.
+
+What it affected: that set is never trained on, but it was one of the held-out checks used to
+choose between one shared temperature and one per question type. It argued for the shared
+temperature we shipped - and the per-type option measures *better* on the public items (hard-tier
+ECE 0.046 against 0.066), so the echo cost us rather than helped. A temperature never reorders a
+distribution, so no accuracy figure in any table changes. No JevBench text has ever been in the
+training data, which the teacher wrote from scratch on a machine with no benchmark files.
+
 ## 0.2.0
 
 - Trained on 3,272 teacher questions, double v0.1's 1,635 and from the same eleven families, plus

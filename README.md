@@ -92,7 +92,7 @@ linear-attention layers fall back to transformers' PyTorch code.
    measured on held-out data and rejected ([training/temp_choice.py](training/temp_choice.py),
    [training/order_avg.py](training/order_avg.py)).
 
-No JevBench item and no output of Jev was used for training, tuning or model selection.
+No JevBench item and no output of Jev was used for training, tuning or model selection (with one correction, see [CHANGELOG](CHANGELOG.md)).
 
 ## It also plays Tetris, badly and well
 

@@ -30,7 +30,8 @@ JEVBENCH_WARM_LOAD=1 python -m jevbench.cli run --adapter jevk5_direct \
 - **Training data:** 3,272 teacher-written decisions (Qwen3.6-27B, Apache-2.0) and 3,272 public
   human-labelled items; no JevBench items and no Jev outputs were used for training, tuning or
   selection. The temperature, and the choice of one temperature over one per question type and over
-  averaging two option orders, come from held-out teacher domains and a hand-written hard set
+  averaging two option orders, come from held-out teacher domains and a hand-written hard set (two
+  echoes of public wording in that set, and what they affected, are in `CHANGELOG.md`)
 
 ## Reference local run (public items)
 

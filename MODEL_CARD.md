@@ -47,7 +47,9 @@ one, and option keys were rebuilt from the option text so that no key hints at t
   temperature per question type, and averaging two option orders, were measured on that held-out
   data and on a hand-written hard set, and both were rejected
 - **No JevBench item, public or held out, and no output of Jev was used for training, tuning or
-  selection.** JevBench's public items were only used to report the numbers below.
+  selection.** JevBench's public items were only used to report the numbers below. One correction:
+  our hand-written calibration set echoed a public instruction and one public item's rule wording;
+  both are rewritten and the effect is described in the repository's `CHANGELOG.md`.
 
 The teacher itself, with thinking, answered all 111 public JevBench hard items correctly; JevK5 is
 an attempt to move part of that into a single fast pass.

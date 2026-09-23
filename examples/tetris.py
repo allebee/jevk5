@@ -169,12 +169,58 @@ def shape_art(piece: str, rotation: int) -> str:
     return "/".join("".join(row) for row in grid)
 
 
+class JevClient:
+    """TypeSafe's /v1/systemone, so Jev can answer the identical question (OpenRouter serves it).
+
+    Set OPENROUTER_API_KEY (or TYPESAFE_API_KEY) in the environment; nothing is read from disk.
+    """
+
+    def __init__(self, model: str = "jev-latest") -> None:
+        import os
+
+        self.key = os.environ.get("OPENROUTER_API_KEY", "").strip()
+        self.url = "https://openrouter.ai/api/v1/systemone"
+        if not self.key:
+            self.key = os.environ.get("TYPESAFE_API_KEY", "").strip()
+            self.url = "https://api.typesafe.ai/v1/systemone"
+        if not self.key:
+            raise SystemExit("set OPENROUTER_API_KEY (or TYPESAFE_API_KEY) to play as Jev")
+        self.model = model
+        self.input_tokens = 0
+
+    def decide(self, state: str, question: dict) -> dict:
+        import json
+        import urllib.request
+
+        body = json.dumps({"model": self.model, "state": state, "questions": {"placement": question}})
+        request = urllib.request.Request(
+            self.url,
+            data=body.encode(),
+            headers={"Authorization": f"Bearer {self.key}", "Content-Type": "application/json"},
+            method="POST",
+        )
+        for attempt in range(9):  # a rate limit or a sleeping laptop must not end the game
+            try:
+                with urllib.request.urlopen(request, timeout=60) as response:
+                    payload = json.loads(response.read())
+                break
+            except Exception as error:  # noqa: BLE001
+                if attempt == 8:
+                    raise
+                wait = min(60, 2 ** attempt)
+                print(f"  {type(error).__name__}, retrying in {wait}s", flush=True)
+                time.sleep(wait)
+        self.input_tokens += (payload.get("usage") or {}).get("input_tokens", 0)
+        return payload["answers"]["placement"]
+
+
 class BriefedPlayer:
     """Every legal placement is described by what it does, and the model judges the trade-off.
 
     No spatial reading is required: the engine states the consequences, the model picks. Options
     are offered in board order, never sorted, and more than `chunk` of them are decided as a
     tournament, so nothing about which option is good leaks from the ordering or the grouping.
+    Both JevK5 and Jev play through this class, so only the decider differs.
     """
 
     name = "briefed"
@@ -267,7 +313,7 @@ class GreedyPlayer:
         return choice
 
 
-def play(player, seed: int, pieces: int, show: bool) -> dict:
+def play(player, seed: int, pieces: int, show: bool, frames: list | None = None) -> dict:
     rng = random.Random(seed)
     board = Board()
     bag = list(PIECES)
@@ -275,10 +321,20 @@ def play(player, seed: int, pieces: int, show: bool) -> dict:
     for placed in range(pieces):
         if not legal(board, current):
             return {"pieces": placed, "lines": board.lines, "holes": board.holes(), "topped_out": True}
+        started = time.perf_counter()
         rotation, column = player.move(board, current, nxt)
+        elapsed = time.perf_counter() - started
         cells = PIECES[current][rotation]
         top = board.landing_row(cells, column)
+        before = board.lines
         board.place(cells, column, top)
+        if frames is not None:
+            frames.append({
+                "board": ["".join("#" if c else "." for c in row) for row in board.rows],
+                "piece": current, "rotation": rotation, "column": column,
+                "cleared": board.lines - before, "lines": board.lines,
+                "holes": board.holes(), "ms": round(elapsed * 1000, 1),
+            })
         if show:
             print(f"\n{current} -> rotation {rotation}, column {column}, lines {board.lines}")
             print(board.draw())
@@ -288,25 +344,33 @@ def play(player, seed: int, pieces: int, show: bool) -> dict:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--player", choices=["model", "briefed", "random", "greedy"], default="model")
+    parser.add_argument("--player", choices=["model", "briefed", "jev", "random", "greedy"], default="model")
     parser.add_argument("--model", default="alibiserikbay/JevK5")
     parser.add_argument("--games", type=int, default=3)
     parser.add_argument("--pieces", type=int, default=60)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--jev-model", default="jev-latest", help="model name for --player jev")
     parser.add_argument("--show", action="store_true", help="print the board after every piece")
+    parser.add_argument("--record", type=Path, help="write every placement to this JSON file")
     args = parser.parse_args()
     if args.player in ("model", "briefed"):
         from jevk5 import JevK5
 
         loaded = JevK5(args.model)
         player = ModelPlayer(loaded) if args.player == "model" else BriefedPlayer(loaded)
-    games = []
+    elif args.player == "jev":
+        player = BriefedPlayer(JevClient(args.jev_model))
+        player.name = "jev"
+    games, recorded = [], []
     for game in range(args.games):
         if args.player == "random":
             player = RandomPlayer(random.Random(1000 + game))
         elif args.player == "greedy":
             player = GreedyPlayer()
-        result = play(player, args.seed + game, args.pieces, args.show)
+        frames = [] if args.record else None
+        result = play(player, args.seed + game, args.pieces, args.show, frames)
+        if args.record:
+            recorded.append({"seed": args.seed + game, "frames": frames, **result})
         games.append(result)
         print(f"game {game + 1}: {result['pieces']} pieces, {result['lines']} lines, "
               f"{result['holes']} buried cells" + (", topped out" if result["topped_out"] else ""))
@@ -315,8 +379,16 @@ def main() -> int:
     survived = sum(not g["topped_out"] for g in games)
     print(f"\n{args.player}: {sum(lines) / len(games):.1f} lines per game (best {max(lines)}), "
           f"{sum(holes) / len(games):.1f} buried cells, survived {survived}/{len(games)} games")
+    if args.record:
+        import json
+
+        args.record.write_text(json.dumps({"player": player.name, "games": recorded}))
+        print(f"wrote {args.record}")
     if getattr(player, "decisions", 0):
         print(f"{player.decisions} decisions, {player.seconds / player.decisions * 1000:.1f} ms each")
+        tokens = getattr(getattr(player, "model", None), "input_tokens", 0)
+        if tokens:
+            print(f"{tokens} input tokens, {tokens / player.decisions:.0f} per decision")
     return 0
 
 
