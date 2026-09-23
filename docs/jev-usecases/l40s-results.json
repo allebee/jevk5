@@ -1,0 +1,671 @@
+{
+  "created_utc": "2026-09-23T18:57:40.903073+00:00",
+  "model": "alibiserikbay/JevK5",
+  "platform": "Linux-5.15.0-126-generic-x86_64-with-glibc2.35",
+  "gpu": "NVIDIA L40S",
+  "pytorch": "2.9.1+cu126",
+  "summary": {
+    "browser": {
+      "correct": 11,
+      "total": 12,
+      "latencies_ms": [
+        67.7,
+        52.52,
+        51.76,
+        60.84,
+        64.34,
+        61.72,
+        53.0,
+        27.6,
+        27.91,
+        28.2,
+        26.7,
+        61.6
+      ]
+    },
+    "router": {
+      "correct": 10,
+      "total": 12,
+      "latencies_ms": [
+        28.58,
+        28.05,
+        28.38,
+        28.31,
+        28.25,
+        28.36,
+        26.62,
+        26.51,
+        26.64,
+        26.69,
+        0,
+        0
+      ]
+    },
+    "extraction": {
+      "correct": 12,
+      "total": 12,
+      "latencies_ms": [
+        26.63,
+        27.82,
+        27.57,
+        26.55,
+        26.71,
+        26.87,
+        28.03,
+        27.98,
+        26.76,
+        26.51,
+        24.36,
+        26.04
+      ]
+    }
+  },
+  "cases": [
+    {
+      "id": "browser_search_blank",
+      "group": "browser",
+      "gold": "TYPE_TEXT:q",
+      "prediction": "TYPE_TEXT:q",
+      "correct": true,
+      "latency_ms": 67.7,
+      "operation_probabilities": {
+        "TYPE_TEXT": 0.6635133624076843,
+        "CLICK": 0.062262602150440216,
+        "WAIT": 0.08629150688648224,
+        "DONE": 0.035170651972293854,
+        "BLOCKED": 0.15276183187961578
+      },
+      "target_probabilities": {
+        "q": 1.0
+      },
+      "input_tokens": 373
+    },
+    {
+      "id": "browser_search_ready",
+      "group": "browser",
+      "gold": "CLICK:go",
+      "prediction": "CLICK:go",
+      "correct": true,
+      "latency_ms": 52.52,
+      "operation_probabilities": {
+        "TYPE_TEXT": 0.22584164142608643,
+        "CLICK": 0.3998073637485504,
+        "WAIT": 0.15018534660339355,
+        "DONE": 0.06121248006820679,
+        "BLOCKED": 0.16295315325260162
+      },
+      "target_probabilities": {
+        "go": 1.0
+      },
+      "input_tokens": 380
+    },
+    {
+      "id": "browser_open_result",
+      "group": "browser",
+      "gold": "CLICK:red",
+      "prediction": "CLICK:red",
+      "correct": true,
+      "latency_ms": 51.76,
+      "operation_probabilities": {
+        "CLICK": 0.9318563342094421,
+        "WAIT": 0.01452616322785616,
+        "DONE": 0.027901843190193176,
+        "BLOCKED": 0.0257156640291214
+      },
+      "target_probabilities": {
+        "red": 0.9967032074928284,
+        "blue": 0.003296836279332638
+      },
+      "input_tokens": 351
+    },
+    {
+      "id": "browser_flight_origin",
+      "group": "browser",
+      "gold": "TYPE_TEXT:from",
+      "prediction": "TYPE_TEXT:from",
+      "correct": true,
+      "latency_ms": 60.84,
+      "operation_probabilities": {
+        "TYPE_TEXT": 0.5311618447303772,
+        "CLICK": 0.12229041755199432,
+        "WAIT": 0.09573845565319061,
+        "DONE": 0.08132349699735641,
+        "BLOCKED": 0.16948577761650085
+      },
+      "target_probabilities": {
+        "from": 0.9631626009941101,
+        "to": 0.03683742135763168
+      },
+      "input_tokens": 404
+    },
+    {
+      "id": "browser_flight_suggestion",
+      "group": "browser",
+      "gold": "CLICK:bos",
+      "prediction": "CLICK:bos",
+      "correct": true,
+      "latency_ms": 64.34,
+      "operation_probabilities": {
+        "CLICK": 0.388202041387558,
+        "TYPE_TEXT": 0.21928606927394867,
+        "WAIT": 0.18626882135868073,
+        "DONE": 0.12386944890022278,
+        "BLOCKED": 0.08237355947494507
+      },
+      "target_probabilities": {
+        "bos": 0.5203868746757507,
+        "go": 0.47961315512657166
+      },
+      "input_tokens": 427
+    },
+    {
+      "id": "browser_flight_destination",
+      "group": "browser",
+      "gold": "TYPE_TEXT:to",
+      "prediction": "TYPE_TEXT:to",
+      "correct": true,
+      "latency_ms": 61.72,
+      "operation_probabilities": {
+        "TYPE_TEXT": 0.46685346961021423,
+        "CLICK": 0.22400793433189392,
+        "WAIT": 0.09130097180604935,
+        "DONE": 0.09130097180604935,
+        "BLOCKED": 0.12653672695159912
+      },
+      "target_probabilities": {
+        "from": 0.12365924566984177,
+        "to": 0.8763407468795776
+      },
+      "input_tokens": 404
+    },
+    {
+      "id": "browser_filter",
+      "group": "browser",
+      "gold": "CLICK:nonstop",
+      "prediction": "CLICK:nonstop",
+      "correct": true,
+      "latency_ms": 53.0,
+      "operation_probabilities": {
+        "CLICK": 0.7769020795822144,
+        "WAIT": 0.057073939591646194,
+        "DONE": 0.07290267199277878,
+        "BLOCKED": 0.09312138706445694
+      },
+      "target_probabilities": {
+        "nonstop": 0.9931535720825195,
+        "first": 0.006846458651125431
+      },
+      "input_tokens": 347
+    },
+    {
+      "id": "browser_filter_already_set",
+      "group": "browser",
+      "gold": "DONE",
+      "prediction": "DONE",
+      "correct": true,
+      "latency_ms": 27.6,
+      "operation_probabilities": {
+        "CLICK": 0.22232048213481903,
+        "WAIT": 0.06025811284780502,
+        "DONE": 0.5918378233909607,
+        "BLOCKED": 0.12558354437351227
+      },
+      "target_probabilities": null,
+      "input_tokens": 351
+    },
+    {
+      "id": "browser_loading",
+      "group": "browser",
+      "gold": "WAIT",
+      "prediction": "BLOCKED",
+      "correct": false,
+      "latency_ms": 27.91,
+      "operation_probabilities": {
+        "CLICK": 0.0340600311756134,
+        "WAIT": 0.30831673741340637,
+        "DONE": 0.015062333084642887,
+        "BLOCKED": 0.6425608992576599
+      },
+      "target_probabilities": null,
+      "input_tokens": 325
+    },
+    {
+      "id": "browser_done",
+      "group": "browser",
+      "gold": "DONE",
+      "prediction": "DONE",
+      "correct": true,
+      "latency_ms": 28.2,
+      "operation_probabilities": {
+        "CLICK": 0.34915855526924133,
+        "WAIT": 0.03857190161943436,
+        "DONE": 0.5250480771064758,
+        "BLOCKED": 0.08722148090600967
+      },
+      "target_probabilities": null,
+      "input_tokens": 322
+    },
+    {
+      "id": "browser_blocked",
+      "group": "browser",
+      "gold": "BLOCKED",
+      "prediction": "BLOCKED",
+      "correct": true,
+      "latency_ms": 26.7,
+      "operation_probabilities": {
+        "WAIT": 0.021016860380768776,
+        "DONE": 0.006180713418871164,
+        "BLOCKED": 0.972802460193634
+      },
+      "target_probabilities": null,
+      "input_tokens": 279
+    },
+    {
+      "id": "browser_injection",
+      "group": "browser",
+      "gold": "TYPE_TEXT:q",
+      "prediction": "TYPE_TEXT:q",
+      "correct": true,
+      "latency_ms": 61.6,
+      "operation_probabilities": {
+        "TYPE_TEXT": 0.584863007068634,
+        "CLICK": 0.08954533189535141,
+        "WAIT": 0.12410353124141693,
+        "DONE": 0.042966078966856,
+        "BLOCKED": 0.15852206945419312
+      },
+      "target_probabilities": {
+        "q": 1.0
+      },
+      "input_tokens": 401
+    },
+    {
+      "id": "router_research",
+      "group": "router",
+      "gold": "research_agent",
+      "prediction": "research_agent",
+      "effective": "needs_clarification",
+      "correct": true,
+      "effective_correct": false,
+      "confidence": 0.7457454800605774,
+      "selected_probability": 0.7457454800605774,
+      "probabilities": {
+        "research_agent": 0.7457454800605774,
+        "support_agent": 0.022329295054078102,
+        "ops_agent": 0.012613285332918167,
+        "needs_clarification": 0.21931192278862
+      },
+      "latency_ms": 28.58,
+      "input_tokens": 330,
+      "model_called": true
+    },
+    {
+      "id": "router_support",
+      "group": "router",
+      "gold": "support_agent",
+      "prediction": "needs_clarification",
+      "effective": "needs_clarification",
+      "correct": false,
+      "effective_correct": false,
+      "confidence": 0.5855832099914551,
+      "selected_probability": 0.5855832099914551,
+      "probabilities": {
+        "research_agent": 0.07018943876028061,
+        "support_agent": 0.21997098624706268,
+        "ops_agent": 0.12425636500120163,
+        "needs_clarification": 0.5855832099914551
+      },
+      "latency_ms": 28.05,
+      "input_tokens": 340,
+      "model_called": true
+    },
+    {
+      "id": "router_ops",
+      "group": "router",
+      "gold": "ops_agent",
+      "prediction": "ops_agent",
+      "effective": "needs_clarification",
+      "correct": true,
+      "effective_correct": false,
+      "confidence": 0.687549889087677,
+      "selected_probability": 0.687549889087677,
+      "probabilities": {
+        "research_agent": 0.03358918055891991,
+        "support_agent": 0.02058676816523075,
+        "ops_agent": 0.687549889087677,
+        "needs_clarification": 0.2582741677761078
+      },
+      "latency_ms": 28.38,
+      "input_tokens": 331,
+      "model_called": true
+    },
+    {
+      "id": "router_ambiguous",
+      "group": "router",
+      "gold": "needs_clarification",
+      "prediction": "needs_clarification",
+      "effective": "needs_clarification",
+      "correct": true,
+      "effective_correct": true,
+      "confidence": 0.9449516534805298,
+      "selected_probability": 0.9449516534805298,
+      "probabilities": {
+        "research_agent": 0.03069934993982315,
+        "support_agent": 0.018815578892827034,
+        "ops_agent": 0.0055333576165139675,
+        "needs_clarification": 0.9449516534805298
+      },
+      "latency_ms": 28.31,
+      "input_tokens": 331,
+      "model_called": true
+    },
+    {
+      "id": "router_unsupported",
+      "group": "router",
+      "gold": "needs_clarification",
+      "prediction": "needs_clarification",
+      "effective": "needs_clarification",
+      "correct": true,
+      "effective_correct": true,
+      "confidence": 0.8501005172729492,
+      "selected_probability": 0.8501005172729492,
+      "probabilities": {
+        "research_agent": 0.0677606388926506,
+        "support_agent": 0.0677606388926506,
+        "ops_agent": 0.014378296211361885,
+        "needs_clarification": 0.8501005172729492
+      },
+      "latency_ms": 28.25,
+      "input_tokens": 331,
+      "model_called": true
+    },
+    {
+      "id": "router_instruction_attack",
+      "group": "router",
+      "gold": "research_agent",
+      "prediction": "research_agent",
+      "effective": "research_agent",
+      "correct": true,
+      "effective_correct": true,
+      "confidence": 0.9353622198104858,
+      "selected_probability": 0.9353622198104858,
+      "probabilities": {
+        "research_agent": 0.9353622198104858,
+        "support_agent": 0.011414995416998863,
+        "ops_agent": 0.0036423543933779,
+        "needs_clarification": 0.04958046227693558
+      },
+      "latency_ms": 28.36,
+      "input_tokens": 340,
+      "model_called": true
+    },
+    {
+      "id": "router_read",
+      "group": "router",
+      "gold": "read_config_tool",
+      "prediction": "read_config_tool",
+      "effective": "needs_clarification",
+      "correct": true,
+      "effective_correct": false,
+      "confidence": 0.7919414639472961,
+      "selected_probability": 0.7919414639472961,
+      "probabilities": {
+        "read_config_tool": 0.7919414639472961,
+        "modify_config_tool": 0.025728369131684303,
+        "needs_clarification": 0.18233022093772888
+      },
+      "latency_ms": 26.62,
+      "input_tokens": 295,
+      "model_called": true
+    },
+    {
+      "id": "router_modify",
+      "group": "router",
+      "gold": "modify_config_tool",
+      "prediction": "needs_clarification",
+      "effective": "needs_clarification",
+      "correct": false,
+      "effective_correct": false,
+      "confidence": 0.4919605255126953,
+      "selected_probability": 0.4919605255126953,
+      "probabilities": {
+        "read_config_tool": 0.12289410829544067,
+        "modify_config_tool": 0.3851453363895416,
+        "needs_clarification": 0.4919605255126953
+      },
+      "latency_ms": 26.51,
+      "input_tokens": 297,
+      "model_called": true
+    },
+    {
+      "id": "router_no_argument",
+      "group": "router",
+      "gold": "needs_clarification",
+      "prediction": "needs_clarification",
+      "effective": "needs_clarification",
+      "correct": true,
+      "effective_correct": true,
+      "confidence": 0.645707905292511,
+      "selected_probability": 0.645707905292511,
+      "probabilities": {
+        "read_config_tool": 0.09111496061086655,
+        "modify_config_tool": 0.2631770968437195,
+        "needs_clarification": 0.645707905292511
+      },
+      "latency_ms": 26.64,
+      "input_tokens": 293,
+      "model_called": true
+    },
+    {
+      "id": "router_read_reword",
+      "group": "router",
+      "gold": "read_config_tool",
+      "prediction": "read_config_tool",
+      "effective": "needs_clarification",
+      "correct": true,
+      "effective_correct": false,
+      "confidence": 0.5929926037788391,
+      "selected_probability": 0.5929926037788391,
+      "probabilities": {
+        "read_config_tool": 0.5929926037788391,
+        "modify_config_tool": 0.04356330633163452,
+        "needs_clarification": 0.36344411969184875
+      },
+      "latency_ms": 26.69,
+      "input_tokens": 300,
+      "model_called": true
+    },
+    {
+      "id": "router_blocked_secret",
+      "group": "router",
+      "gold": "blocked",
+      "prediction": "blocked",
+      "effective": "blocked",
+      "correct": true,
+      "effective_correct": true,
+      "latency_ms": 0,
+      "model_called": false
+    },
+    {
+      "id": "router_blocked_benign",
+      "group": "router",
+      "gold": "blocked",
+      "prediction": "blocked",
+      "effective": "blocked",
+      "correct": true,
+      "effective_correct": true,
+      "latency_ms": 0,
+      "model_called": false
+    },
+    {
+      "id": "extract_issue_date",
+      "group": "extraction",
+      "gold": "c0",
+      "prediction": "c0",
+      "correct": true,
+      "probabilities": {
+        "c0": 0.9049074649810791,
+        "c1": 0.01017805840820074,
+        "null": 0.08491447567939758
+      },
+      "latency_ms": 26.63,
+      "input_tokens": 320
+    },
+    {
+      "id": "extract_due_first",
+      "group": "extraction",
+      "gold": "c1",
+      "prediction": "c1",
+      "correct": true,
+      "probabilities": {
+        "c0": 0.021250072866678238,
+        "c1": 0.770037829875946,
+        "null": 0.20871210098266602
+      },
+      "latency_ms": 27.82,
+      "input_tokens": 326
+    },
+    {
+      "id": "extract_date_ambiguous",
+      "group": "extraction",
+      "gold": "null",
+      "prediction": "null",
+      "correct": true,
+      "probabilities": {
+        "c0": 0.02250075340270996,
+        "c1": 0.017615342512726784,
+        "null": 0.9598839282989502
+      },
+      "latency_ms": 27.57,
+      "input_tokens": 329
+    },
+    {
+      "id": "extract_vendor",
+      "group": "extraction",
+      "gold": "c1",
+      "prediction": "c1",
+      "correct": true,
+      "probabilities": {
+        "c0": 0.009940368123352528,
+        "c1": 0.9589069485664368,
+        "null": 0.031152725219726562
+      },
+      "latency_ms": 26.55,
+      "input_tokens": 266
+    },
+    {
+      "id": "extract_vendor_first",
+      "group": "extraction",
+      "gold": "c0",
+      "prediction": "c0",
+      "correct": true,
+      "probabilities": {
+        "c0": 0.9371481537818909,
+        "c1": 0.00895362813025713,
+        "null": 0.053898248821496964
+      },
+      "latency_ms": 26.71,
+      "input_tokens": 263
+    },
+    {
+      "id": "extract_party_ambiguous",
+      "group": "extraction",
+      "gold": "null",
+      "prediction": "null",
+      "correct": true,
+      "probabilities": {
+        "c0": 0.022587141022086143,
+        "c1": 0.013843621127307415,
+        "null": 0.9635692238807678
+      },
+      "latency_ms": 26.87,
+      "input_tokens": 266
+    },
+    {
+      "id": "extract_total",
+      "group": "extraction",
+      "gold": "c2",
+      "prediction": "c2",
+      "correct": true,
+      "probabilities": {
+        "c0": 0.006630768068134785,
+        "c1": 0.002702565398067236,
+        "c2": 0.9618661403656006,
+        "null": 0.02880040556192398
+      },
+      "latency_ms": 28.03,
+      "input_tokens": 360
+    },
+    {
+      "id": "extract_total_first",
+      "group": "extraction",
+      "gold": "c0",
+      "prediction": "c0",
+      "correct": true,
+      "probabilities": {
+        "c0": 0.9223726987838745,
+        "c1": 0.008812461979687214,
+        "c2": 0.011256486177444458,
+        "null": 0.05755830928683281
+      },
+      "latency_ms": 27.98,
+      "input_tokens": 360
+    },
+    {
+      "id": "extract_amount_ambiguous",
+      "group": "extraction",
+      "gold": "null",
+      "prediction": "null",
+      "correct": true,
+      "probabilities": {
+        "c0": 0.015274337492883205,
+        "c1": 0.004873812198638916,
+        "null": 0.9798519015312195
+      },
+      "latency_ms": 26.76,
+      "input_tokens": 293
+    },
+    {
+      "id": "extract_credit_note",
+      "group": "extraction",
+      "gold": "c0",
+      "prediction": "c0",
+      "correct": true,
+      "probabilities": {
+        "c0": 0.939625084400177,
+        "c1": 0.010568559169769287,
+        "null": 0.049806419759988785
+      },
+      "latency_ms": 26.51,
+      "input_tokens": 258
+    },
+    {
+      "id": "extract_receipt",
+      "group": "extraction",
+      "gold": "c0",
+      "prediction": "c0",
+      "correct": true,
+      "probabilities": {
+        "c0": 0.4961414635181427,
+        "c1": 0.0824194923043251,
+        "null": 0.4214390218257904
+      },
+      "latency_ms": 24.36,
+      "input_tokens": 251
+    },
+    {
+      "id": "extract_injection",
+      "group": "extraction",
+      "gold": "c1",
+      "prediction": "c1",
+      "correct": true,
+      "probabilities": {
+        "c0": 0.016123097389936447,
+        "c1": 0.8785694241523743,
+        "null": 0.10530748218297958
+      },
+      "latency_ms": 26.04,
+      "input_tokens": 308
+    }
+  ]
+}

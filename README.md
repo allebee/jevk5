@@ -45,6 +45,11 @@ Measured on an **NVIDIA L40S**: **20.49 ms p50 / 20.89 ms p95**, 30 warm calls o
 excludes model loading, network transport, and the demo's reading pauses. The video replays
 actual timestamped GPU output. This is one example, not a benchmark-wide latency claim.
 
+**[Outside JevBench: public Jev use-case tests](docs/jev-usecases/README.md).** On 36 small cases
+adapted from browser actions, tool routing, and document extraction, JevK5 chose the expected
+answer in 33. The router's 0.85 confidence gate passed only 1 of 7 actionable requests, so
+this is not yet a drop-in result for that workflow. These are local cases, not a Jev head-to-head.
+
 ## JevBench result
 
 **[JevBench v1.4](https://benchmarkheaven.com/jev-models) ranks JevK5 v0.2 second of 76 systems**,
