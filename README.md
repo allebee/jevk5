@@ -11,13 +11,22 @@ behind Jev 1.13.0 (63.29 against 62.04) and ahead of every other open system. Ju
 identical to Jev's; the fastest Speed axis in the top five. Measured by the benchmark's author on
 their own hardware, not by us.
 
-![JevBench v1.4: JevK5 is second of 76](docs/jevbench-v1.4.png)
+## Watch it run
 
-**Watch JevK5 work:** [typed decision and probabilities on an NVIDIA L40S (27 seconds)](docs/demo/jevk5-nvidia-demo.mp4)
-· [Snake game against seeded random (24 seconds)](docs/game-demos/snake.mp4).
-The first video is a paced replay of a real GPU run; its displayed decision took 20.60 ms after
-model loading. The second is a live capture using [Prompt Engineer 48's MIT-licensed arena](https://github.com/PromptEngineer48/laya-vs-jev-arena):
-JevK5 collected 7 apples to random's 3. The game is not a Jev comparison.
+**Typed decision on an NVIDIA L40S.** A real support ticket becomes a probability over three teams;
+the displayed decision took 20.60 ms after model loading. This is a paced replay of recorded GPU output.
+Click the moving preview for the [full 27-second video](docs/demo/jevk5-nvidia-demo.mp4).
+
+[![JevK5 turns a support ticket into a typed decision with probabilities](docs/demo/jevk5-preview.gif)](docs/demo/jevk5-nvidia-demo.mp4)
+
+**Snake against seeded random.** JevK5 collected 7 apples to random's 3 in a live browser capture
+using [Prompt Engineer 48's MIT-licensed arena](https://github.com/PromptEngineer48/laya-vs-jev-arena).
+Click the moving preview for the [full 24-second video](docs/game-demos/snake.mp4).
+This game is not a Jev comparison.
+
+[![JevK5 plays Snake against a seeded random player](docs/game-demos/snake-preview.gif)](docs/game-demos/snake.mp4)
+
+![JevBench v1.4: JevK5 is second of 76](docs/jevbench-v1.4.png)
 
 | | |
 |---|---|
