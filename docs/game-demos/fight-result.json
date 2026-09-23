@@ -1,0 +1,44 @@
+{
+  "recorded_at": "2026-09-23T17:22:22.672Z",
+  "tempo_scale": 2.21,
+  "kick_startup_ms": 530,
+  "elapsed_sec": 24.1,
+  "winner": "RIGHT",
+  "end_reason": "TIME — most health left",
+  "sides": [
+    {
+      "model": "jevk5",
+      "health_left": 83,
+      "damage_dealt": 0,
+      "damage_taken": 17,
+      "attacks_thrown": 10,
+      "attacks_landed": 0,
+      "attacks_blocked_by_foe": 0,
+      "times_i_blocked": 1,
+      "decisions": 99,
+      "decisions_per_sec": 4.11,
+      "latency_p50_ms": 468,
+      "latency_p95_ms": 561,
+      "input_tokens": 94193,
+      "output_tokens": 0,
+      "error": null
+    },
+    {
+      "model": "seeded_random",
+      "health_left": 100,
+      "damage_dealt": 17,
+      "damage_taken": 0,
+      "attacks_thrown": 12,
+      "attacks_landed": 1,
+      "attacks_blocked_by_foe": 1,
+      "times_i_blocked": 0,
+      "decisions": 175,
+      "decisions_per_sec": 7.25,
+      "latency_p50_ms": 389,
+      "latency_p95_ms": 497,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": null
+    }
+  ]
+}

@@ -37,6 +37,7 @@ billing {'billing': 0.993918, 'technical': 0.004944, 'sales': 0.001138}
 ```
 
 **[Watch the 27-second NVIDIA demo](docs/demo/jevk5-nvidia-demo.mp4)** ·
+[Watch Snake, Tetris, and Kombat](docs/game-demos/README.md) ·
 [Run the timed example](examples/quickstart.py) · [Raw measurements](docs/demo/l40s-run.json)
 
 Measured on an **NVIDIA L40S**: **20.49 ms p50 / 20.89 ms p95**, 30 warm calls on this
@@ -129,6 +130,10 @@ linear-attention layers fall back to transformers' PyTorch code.
 No JevBench item and no output of Jev was used for training, tuning or model selection (with one correction, see [CHANGELOG](CHANGELOG.md)).
 
 ## It also plays Tetris, badly and well
+
+**[Watch the NVIDIA game demos](docs/game-demos/README.md):** 15 Tetris lines in one
+77-piece run; 7 apples to a seeded random player's 3 in Snake; and a fight that
+exposes a weakness, with no JevK5 hit landed. These games are not Jev matchups.
 
 [`examples/tetris.py`](examples/tetris.py) turns Tetris into typed decisions. Reading the board as
 characters, JevK5 plays at random: 0.0 lines a game, topping out after 26 pieces, usually taking the
