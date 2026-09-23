@@ -6,6 +6,13 @@ Give it a state (a ticket, a log, a policy, a diff) and typed questions: yes/no,
 It returns a probability for every option, with zero generated tokens, in about 13 ms on one
 GPU. It answers TypeSafe's `/v1/systemone` shape, so Jev-style clients can point at it.
 
+**[JevBench v1.4](https://benchmarkheaven.com/jev-models) ranks JevK5 v0.2 second of 76 systems**,
+behind Jev 1.13.0 (63.29 against 62.04) and ahead of every other open system. Judge tier 0.945,
+identical to Jev's; the fastest Speed axis in the top five. Measured by the benchmark's author on
+their own hardware, not by us.
+
+![JevBench v1.4: JevK5 is second of 76](docs/jevbench-v1.4.png)
+
 | | |
 |---|---|
 | Weights | [alibiserikbay/JevK5](https://huggingface.co/alibiserikbay/JevK5): Qwen3.5-4B + a distilled LoRA, merged (Apache-2.0) |
