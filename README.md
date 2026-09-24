@@ -127,7 +127,7 @@ Index's request shape, 500 items each and none that v0.2 trained on
 The alternative we built, `method="tree"`, reads one pass whose letters stand for whole groups. It
 scored 0.636 on BANKING77 and 0.584 on CLINC150, and is kept only to reproduce the comparison.
 Through llama.cpp, the Q8_0 file gives the same answer as bf16 on 95 of 100 BANKING77 items and on
-59 of 60 CLINC150 items.
+116 of 119 CLINC150 items (60 out-of-scope, 59 in-scope).
 
 **Weak spot: out of scope.** On CLINC150, "none of the listed intents" reaches the final in all 91
 out-of-scope items but wins it in only 33. It also wins in 58 in-scope items, which leaves recall
