@@ -2,11 +2,11 @@
 
 ## 0.2.2 (unreleased)
 
-- **Any number of options.** Questions with more than 16 options were refused (13% of the Jev
-  Decision Index's requests: BANKING77, CLINC150, API-Bank, POP909). They are now read in groups of
-  at most 16 plus a final of 16, and `decide()` returns a probability for every option. The weights
-  are unchanged. See the README's "More than 16 options"; the logic lives in `jevk5/prompt.py`, and
-  both runtimes use it.
+- **Any number of options.** Questions with more than 16 options were refused: 12.7% of the Jev
+  Decision Index's requests, in CLINC150, ChessBench, BANKING77, POP909, API-Bank and HLE. They are
+  now read in groups of at most 16 plus a final of 16, and `decide()` returns a probability for
+  every option. The weights are unchanged. See the README's "More than 16 options"; the logic
+  lives in `jevk5/prompt.py`, and both runtimes use it.
 - Up to 16 options, nothing changes: probabilities are bit-identical to 0.2.1 on all 231 public
   items, through CUDA and through llama.cpp (`bench/parity.py`).
 - Train-split results, every option offered: BANKING77 0.690 accuracy (ECE 0.039), CLINC150 0.666
