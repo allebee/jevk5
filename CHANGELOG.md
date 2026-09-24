@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.2.2 (unreleased)
+
+- **Any number of options.** Questions with more than 16 options were refused (13% of the Jev
+  Decision Index's requests: BANKING77, CLINC150, API-Bank, POP909). They are now read in groups of
+  at most 16 plus a final of 16, and `decide()` returns a probability for every option. The weights
+  are unchanged. See the README's "More than 16 options"; the logic lives in `jevk5/prompt.py`, and
+  both runtimes use it.
+- Up to 16 options, nothing changes: probabilities are bit-identical to 0.2.1 on all 231 public
+  items, through CUDA and through llama.cpp (`bench/parity.py`).
+- Train-split results, every option offered: BANKING77 0.690 accuracy (ECE 0.039), CLINC150 0.666
+  (ECE 0.039), MASSIVE 0.754 (ECE 0.038); 116-199 ms on an H100. The combination rule and its
+  temperature (0.77) were chosen and fitted on MASSIVE, which is not on the Decision Index.
+- Measured and not shipped: a tree readout, whose first pass picks among groups (BANKING77 0.636,
+  CLINC150 0.584), and two other ways of combining the same passes.
+- `input_tokens` counts the tokens of every pass. The JevBench adapter's 16,384-token limit applies
+  to the longest pass (`last_pass_tokens`).
+
 ## Correction, 2026-09-24: MMLU-Pro test items in the training data
 
 MMLU-Pro has no training split, and our replay builder drew its items from a hashed 80% of the test

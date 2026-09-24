@@ -21,8 +21,9 @@ JEVBENCH_WARM_LOAD=1 python -m jevbench.cli run --adapter jevk5_direct \
   position, divided by the temperature. 0 output tokens.
 - **Option mapping:** identical to `semif_direct` (noul -> true/false, choice -> criteria keys,
   score -> level indices; each option shown as "<id>: <description>")
-- **Limits:** at most 16 options; inputs over 16,384 tokens are refused (recorded as a failure by
-  the runner), never truncated. v0.1.0 refused inputs over 4,096 tokens
+- **Limits:** up to 16 options in one pass, more in groups of 16 plus a final (0.2.2; bit-identical
+  up to 16); inputs over 16,384 tokens per pass are refused (recorded as a failure by the runner),
+  never truncated. v0.1.0 refused inputs over 4,096 tokens
 - **Runtime:** CUDA graphs per padded length (128 ... 4096 tokens), captured at load (~3 s);
   longer inputs run the same model eagerly
 - **Cost basis:** same weights class as SemIf: deepinfra Qwen3.5-4B, $0.03/M input tokens;

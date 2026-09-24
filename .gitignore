@@ -6,3 +6,4 @@ models/
 .DS_Store
 ISSUE_DRAFT.md
 .env
+LIFT_REQUEST_DRAFT.md

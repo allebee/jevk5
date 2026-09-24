@@ -42,9 +42,10 @@ This game is not a Jev comparison.
 JevK5 uses open Qwen3.5-4B weights and [SemIf's option-logit readout](https://github.com/TheoLeeCJ/SemIf),
 not Jev's unpublished model architecture. It supports the same three decision types—`noul`
 (yes/no), `choice`, and `score`—through a TypeSafe-style endpoint. Each question is evaluated
-separately; the server serializes requests on one GPU. The model is English-only, supports up to
-16 options, and refuses inputs over 16,384 tokens. Its quality on Jev's published real-world
-workflows has not yet been measured.
+separately; the server serializes requests on one GPU. The model is English-only, answers up to 16
+options in one pass and more in several (see [More than 16 options](#more-than-16-options)), and
+refuses inputs over 16,384 tokens. Its quality on Jev's published real-world workflows has not yet
+been measured.
 
 ## Results on JevBench's public items
 
@@ -95,6 +96,42 @@ model.decide(
 Question types: `noul` (yes/no, optional `criteria` {"true": ..., "false": ...}), `choice`
 (`criteria` {key: description} or a list of keys), `score` (`criteria` a list of level
 descriptions, lowest first).
+
+### More than 16 options
+
+JevK5 answers with one of 16 letters, so up to 16 options take one pass, exactly as before: 0.2.2
+returns bit-identical probabilities to 0.2.1 on all 231 public items, through both runtimes. With
+more options, `decide()` still returns a probability for every option, summing to 1, with no
+retraining:
+
+1. The options are split, in order, into groups of at most 16, and each group is read.
+2. A final of 16 is read: the top options of every group, the free places going to the next most
+   likely options in any group.
+3. Finalists keep the final's distribution, times the chance the answer is among them. Every other
+   option gets its group's share of the final times its in-group probability.
+4. The letter temperature is fitted on questions of up to 16 options and leaves this combination
+   underconfident, so it is sharpened by a second temperature, 0.77. That value was fitted on
+   MASSIVE's train split, which is not a Decision Index benchmark. It never changes the answer.
+
+That is ceil(n / 16) + 1 passes. `JevK5GGUF` combines its passes the same way
+([jevk5/prompt.py](jevk5/prompt.py)). On train splits, with every intent offered in the Decision
+Index's request shape, 500 items each and none that v0.2 trained on
+([bench/many_options.py](bench/many_options.py)):
+
+| Train split | Options | Passes | Accuracy | Macro-F1 | ECE | p50 on an H100 |
+|---|---:|---:|---:|---:|---:|---:|
+| MASSIVE en-US (the fitting set) | 60 | 5 | 0.754 | 0.746 | 0.038 | 89 ms |
+| BANKING77 | 77 | 6 | 0.690 | 0.674 | 0.039 | 116 ms |
+| CLINC150 with out-of-scope | 151 | 11 | 0.666 | 0.720 | 0.039 | 199 ms |
+
+The alternative we built, `method="tree"`, reads one pass whose letters stand for whole groups. It
+scored 0.636 on BANKING77 and 0.584 on CLINC150, and is kept only to reproduce the comparison.
+Through llama.cpp, the Q8_0 file gives the same answer as bf16 on 95 of 100 BANKING77 items and on
+59 of 60 CLINC150 items.
+
+**Weak spot: out of scope.** On CLINC150, "none of the listed intents" reaches the final in all 91
+out-of-scope items but wins it in only 33. It also wins in 58 in-scope items, which leaves recall
+and precision at 0.36 each.
 
 As a server:
 

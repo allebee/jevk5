@@ -15,6 +15,8 @@ Nothing is generated: the server evaluates the prompt, returns the log-probabili
 position, and this module keeps the declared options' letters and renormalises them under the
 calibration temperature - the same readout as the CUDA runtime, and mathematically identical,
 since a softmax over letter logits and a renormalised slice of the full-vocabulary softmax agree.
+Questions with more than 16 options take several such requests, combined exactly as the CUDA
+runtime combines its passes (`jevk5.prompt.spread`).
 
 Needs a llama.cpp new enough to load Qwen3.5's hybrid layers (the published files were made and
 checked at commit 9575389). To convert your own checkpoint, pass `--no-mtp` to
@@ -30,7 +32,7 @@ import sys
 import urllib.request
 from pathlib import Path
 
-from .prompt import LETTERS, answer, decision_options, prompt_text
+from .prompt import LETTERS, METHODS, answer, decision_options, prompt_text, spread
 
 MISSING_MARGIN = 2.0  # a letter outside the returned top-k sits at least this far below the last
 
@@ -40,7 +42,8 @@ class JevK5GGUF:
 
     `url` is the server (llama-server's default port); `temperature` defaults to the value in a
     `jevk5_config.json` passed as `config`, or to JevK5 v0.2's 1.532. Use 1.42 for JevK5-2B. `top_k` asks for that many token log-probabilities at the answer
-    position, which needs to cover the options you use.
+    position, which needs to cover the 16 letters. `method` reads questions with more than 16
+    options, "knockout" or "tree", exactly as the CUDA runtime does (`jevk5.prompt.spread`).
     """
 
     def __init__(
@@ -50,7 +53,11 @@ class JevK5GGUF:
         top_k: int = 40,
         timeout_s: float = 600.0,
         config: str | None = None,
+        method: str = "knockout",
     ) -> None:
+        if method not in METHODS:
+            raise ValueError(f"unknown method {method!r}; use one of {METHODS}")
+        self.method = method
         self.url = url.rstrip("/")
         self.top_k = top_k
         self.timeout_s = timeout_s
@@ -97,20 +104,29 @@ class JevK5GGUF:
         )
 
     def probabilities(self, state, question: dict) -> tuple[dict[str, float], int]:
-        """Calibrated probability per option id, and the input token count."""
+        """Calibrated probability per option id, and the input token count (summed over passes
+        when a question has more than 16 options; the longest pass is `last_pass_tokens`)."""
         options = decision_options(question)
-        if len(options) > len(LETTERS):
-            raise ValueError(f"{len(options)} options exceed the {len(LETTERS)} answer letters")
-        prompt = prompt_text(state, question["instructions"], [text for _, text in options])
-        seen, tokens, self.last_seconds = self._logprobs(prompt)
-        floor = min(seen.values(), default=0.0) - MISSING_MARGIN
-        logprobs = [seen.get(LETTERS[i], floor) for i in range(len(options))]
-        if any(LETTERS[i] not in seen for i in range(len(options))):
-            self.missing += 1
-        top = max(logprobs)
-        weights = [math.exp((z - top) / self.temperature) for z in logprobs]
-        total = sum(weights)
-        return {key: w / total for (key, _), w in zip(options, weights, strict=True)}, tokens
+        tokens, self.last_pass_tokens, self.last_seconds = 0, 0, 0.0
+
+        def read(texts: list[str]) -> list[float]:
+            nonlocal tokens
+            prompt = prompt_text(state, question["instructions"], texts)
+            seen, count, seconds = self._logprobs(prompt)
+            tokens += count
+            self.last_pass_tokens = max(self.last_pass_tokens, count)
+            self.last_seconds += seconds
+            floor = min(seen.values(), default=0.0) - MISSING_MARGIN
+            logprobs = [seen.get(LETTERS[i], floor) for i in range(len(texts))]
+            if any(LETTERS[i] not in seen for i in range(len(texts))):
+                self.missing += 1
+            top = max(logprobs)
+            weights = [math.exp((z - top) / self.temperature) for z in logprobs]
+            total = sum(weights)
+            return [w / total for w in weights]
+
+        probs = spread(read, [text for _, text in options], self.method)
+        return {key: v for (key, _), v in zip(options, probs, strict=True)}, tokens
 
     def decide(self, state, question: dict) -> dict:
         probs, tokens = self.probabilities(state, question)

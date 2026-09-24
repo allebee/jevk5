@@ -5,6 +5,8 @@ decision as JSON (evidence, criterion, lettered options), the chat template with
 and a softmax over the answer letters' next-token logits. JevK5 adds weights distilled from a
 thinking teacher, one calibration temperature, and a CUDA-graph runtime: one graph is recorded
 per padded input length and replayed, so a decision costs ~13 ms on an H100 instead of ~70 ms.
+Questions with more than 16 options are read in groups of up to 16 and a final between the
+groups' best options (`jevk5.prompt.spread`); up to 16 options, nothing changes.
 
     from jevk5 import JevK5
     model = JevK5("alibiserikbay/JevK5")
@@ -21,7 +23,15 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from .prompt import LETTERS, SYSTEM, decision_options, messages  # noqa: F401 - public re-exports
+from .prompt import (  # noqa: F401 - public re-exports
+    LETTERS,
+    METHODS,
+    SYSTEM,
+    answer,
+    decision_options,
+    messages,
+    spread,
+)
 
 GRAPH_LENGTHS = (128, 192, 256, 320, 384, 512, 640, 768, 1024, 1536, 2048, 3072, 4096)
 
@@ -47,8 +57,15 @@ class JevK5:
         dtype=torch.bfloat16,
         graphs: bool = True,
         temperature: float | None = None,
+        method: str = "knockout",
     ) -> None:
+        """`method` reads questions with more than 16 options: "knockout" or "tree" (see
+        `jevk5.prompt.spread`). Questions with up to 16 options take one pass either way."""
         import transformers
+
+        if method not in METHODS:
+            raise ValueError(f"unknown method {method!r}; use one of {METHODS}")
+        self.method = method
 
         config = transformers.AutoConfig.from_pretrained(source)
         self.tok = transformers.AutoTokenizer.from_pretrained(source)
@@ -115,23 +132,25 @@ class JevK5:
         return self._slot_logits(tensor, last)[0, :count].float().cpu().numpy()
 
     def probabilities(self, state, question: dict) -> tuple[dict[str, float], int]:
-        """Calibrated probability per option id, and the input token count."""
+        """Calibrated probability per option id, and the input token count (summed over passes
+        when a question has more than 16 options; the longest pass is `last_pass_tokens`)."""
         options = decision_options(question)
-        ids = self.encode(state, question["instructions"], [text for _, text in options])
-        logits = self.letter_logits(ids, len(options)) / self.temperature
-        p = np.exp(logits - logits.max())
-        p /= p.sum()
-        return {key: float(v) for (key, _), v in zip(options, p, strict=True)}, len(ids)
+        tokens = self.last_pass_tokens = 0
+
+        def read(texts: list[str]) -> list[float]:
+            nonlocal tokens
+            ids = self.encode(state, question["instructions"], texts)
+            tokens += len(ids)
+            self.last_pass_tokens = max(self.last_pass_tokens, len(ids))
+            logits = self.letter_logits(ids, len(texts)) / self.temperature
+            p = np.exp(logits - logits.max())
+            p /= p.sum()
+            return [float(v) for v in p]
+
+        probs = spread(read, [text for _, text in options], self.method)
+        return {key: v for (key, _), v in zip(options, probs, strict=True)}, tokens
 
     def decide(self, state, question: dict) -> dict:
         """One typed decision in TypeSafe's /v1/systemone answer shape."""
         probs, tokens = self.probabilities(state, question)
-        kind = question["type"]
-        answer = {"type": kind, "confidence": max(probs.values()), "input_tokens": tokens}
-        if kind == "noul":
-            answer["noul"] = probs["true"]
-        elif kind == "choice":
-            answer.update(choice=max(probs, key=probs.get), probabilities=probs)
-        else:
-            answer.update(score=sum(int(k) * v for k, v in probs.items()), probabilities=probs)
-        return answer
+        return answer(question, probs, tokens)

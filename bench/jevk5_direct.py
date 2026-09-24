@@ -7,9 +7,10 @@ Hub commit. Option mapping is the same as JevBench's semif_direct adapter:
   * choice -> one option per criteria key, "<key>: <description>"
   * score  -> options "0".."k-1", "<i>: <level text>"
 The distribution is the softmax over the declared answer letters' logits at the last position,
-divided by JevK5's calibration temperature (jevk5_config.json next to the weights).
-Inputs up to 16,384 tokens are answered (CUDA graphs up to 4,096, eager beyond); longer ones
-are refused, never truncated.
+divided by JevK5's calibration temperature (jevk5_config.json next to the weights). Questions with
+more than 16 options take several such passes (jevk5.prompt.spread).
+Inputs up to 16,384 tokens per pass are answered (CUDA graphs up to 4,096, eager beyond); longer
+ones are refused, never truncated. Usage counts the tokens of every pass.
 """
 
 from __future__ import annotations
@@ -59,8 +60,9 @@ class JevK5DirectAdapter:
         t0 = time.perf_counter()
         try:
             probs, tokens = model.probabilities(task.state, task.question)
-            if tokens > self.max_tokens:
-                raise ValueError(f"{tokens} input tokens exceed limit {self.max_tokens}")
+            longest = getattr(model, "last_pass_tokens", tokens)
+            if longest > self.max_tokens:
+                raise ValueError(f"{longest} input tokens exceed limit {self.max_tokens}")
         except Exception as e:  # noqa: BLE001
             res.latency_s = time.perf_counter() - t0
             res.error = f"{type(e).__name__}: {str(e)[:300]}"
