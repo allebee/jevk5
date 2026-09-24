@@ -66,7 +66,8 @@ one, and option keys were rebuilt from the option text so that no key hints at t
 
 - 3,272 of those questions (v0.1 used 1,635), plus as many human-labelled items from MMLU-Pro
   (MIT), WANLI (CC BY 4.0), MultiNLI, BoolQ (CC BY-SA 3.0), banking77 (CC BY 4.0), ARC
-  (CC BY-SA 4.0) and CommonsenseQA (MIT)
+  (CC BY-SA 4.0) and CommonsenseQA (MIT). The 940 MMLU-Pro items came from its test split, as
+  MMLU-Pro has no training split; see the 2026-09-24 correction in the repository's `CHANGELOG.md`
 - Cross-entropy on the option-letter logits, 2 epochs, learning rate 3e-5, SemIf's prompt format.
   A question whose answer is a distribution trains against that exact distribution rather than a
   single letter; this checkpoint contains 9 such questions, a pilot of the family

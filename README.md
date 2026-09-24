@@ -151,7 +151,8 @@ decision on a CPU alone, and 0.6 s for the 4B on an M1 Pro; consumer GPUs are no
    when both answers match the intended one. Option keys are rebuilt from the option text.
 2. **Training** ([training/lora.py](training/lora.py)): LoRA rank 16 on attention projections,
    cross-entropy on the option-letter logits, 3,272 teacher questions + 3,272 human-labelled items
-   (MMLU-Pro, WANLI, MultiNLI, BoolQ, banking77, ARC, CommonsenseQA), 2 epochs, lr 3e-5. A question
+   (MMLU-Pro, WANLI, MultiNLI, BoolQ, banking77, ARC, CommonsenseQA; the MMLU-Pro items came from
+   its test split, see [the correction](CHANGELOG.md)), 2 epochs, lr 3e-5. A question
    that carries an exact distribution trains against it rather than a single letter (9 so far).
 3. **Calibration:** one temperature (1.532), fitted on teacher questions from three domains that
    training never saw. A temperature per question type and averaging two option orders were both

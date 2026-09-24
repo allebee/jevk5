@@ -1,5 +1,25 @@
 # Changelog
 
+## Correction, 2026-09-24: MMLU-Pro test items in the training data
+
+MMLU-Pro has no training split, and our replay builder drew its items from a hashed 80% of the test
+split. JevK5 v0.2 and JevK5-2B were trained on 940 MMLU-Pro test items; v0.1 on 461 of the same
+items. They correspond to 980 MMLU-Pro `question_id`s (31 question texts appear under several ids),
+listed in [results/mmlu_pro_training_ids.json](results/mmlu_pro_training_ids.json). The Jev Decision
+Index had flagged the overlap without a count.
+
+Measured with the design the index used for a similar case
+([training/mmlu_leak.py](training/mmlu_leak.py)): JevK5 v0.2 scores 0.622 on the 940 trained items
+and 0.541 on 2,000 MMLU-Pro test items it never saw; the untrained Qwen3.5-4B scores 0.431 and 0.405
+on the same two sets. The difference in differences, +5.5 points (95% CI +1.8 to +9.2), is
+memorization of those items. Across all 12,032 MMLU-Pro test items it is worth about 0.4 points of
+accuracy.
+
+Every other replay set came from a training split (WANLI, MultiNLI, BoolQ, banking77, ARC,
+CommonsenseQA). The dev set also held 130 MMLU-Pro and 47 banking77 test items, used only for
+reporting; model choices were made on held-out teacher questions and a hand-written set. The next
+version uses no test split of any dataset.
+
 ## 0.2.1
 
 - **GGUF builds and a 2B model.** [JevK5-GGUF](https://huggingface.co/alibiserikbay/JevK5-GGUF)

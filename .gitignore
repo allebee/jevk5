@@ -5,3 +5,4 @@ data/
 models/
 .DS_Store
 ISSUE_DRAFT.md
+.env
