@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.2 (unreleased)
+## 0.2.2
 
 - **Any number of options.** Questions with more than 16 options were refused: 12.7% of the Jev
   Decision Index's requests, in CLINC150, ChessBench, BANKING77, POP909, API-Bank and HLE. They are
