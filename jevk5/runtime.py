@@ -21,39 +21,9 @@ from pathlib import Path
 import numpy as np
 import torch
 
-LETTERS = "ABCDEFGHIJKLMNOP"
-SYSTEM = (
-    "Apply the supplied criterion to the supplied evidence. Choose exactly one listed option. "
-    "Respond with only its uppercase letter, with no explanation or reasoning."
-)
+from .prompt import LETTERS, SYSTEM, decision_options, messages  # noqa: F401 - public re-exports
+
 GRAPH_LENGTHS = (128, 192, 256, 320, 384, 512, 640, 768, 1024, 1536, 2048, 3072, 4096)
-
-
-def messages(state, criterion: str, options: list[str]) -> list[dict]:
-    payload = {
-        "evidence": state,
-        "criterion": criterion,
-        "options": [{"letter": LETTERS[i], "description": d} for i, d in enumerate(options)],
-    }
-    return [
-        {"role": "system", "content": SYSTEM},
-        {"role": "user", "content": json.dumps(payload, ensure_ascii=False)},
-    ]
-
-
-def decision_options(question: dict) -> list[tuple[str, str]]:
-    """(option id, option text) for a typed question: noul -> true/false, choice -> its
-    criteria, score -> level indices. Texts are "id: description", as SemIf's JevBench mapping."""
-    crit = question.get("criteria")
-    if question["type"] == "noul":
-        pairs = [(k, (crit or {}).get(k) or f"The proposition is {k}.") for k in ("true", "false")]
-    elif question["type"] == "choice":
-        if isinstance(crit, list):
-            crit = dict.fromkeys(crit)
-        pairs = [(k, v or k) for k, v in crit.items()]
-    else:
-        pairs = [(str(i), level) for i, level in enumerate(crit)]
-    return [(k, f"{k}: {d}") for k, d in pairs]
 
 
 def _load_temperature(source: str) -> float:

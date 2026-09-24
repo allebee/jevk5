@@ -36,6 +36,14 @@ on the Hub call `generate()` and do not perform JevK5's decision readout.
   padded input length: ~13 ms per decision on an H100 (eager transformers: ~70 ms), same answers
 - **License:** Apache-2.0
 
+## Other sizes and formats
+
+- **[JevK5-GGUF](https://huggingface.co/alibiserikbay/JevK5-GGUF)**: GGUF builds for llama.cpp, so
+  JevK5 runs on NVIDIA, AMD, Intel and Apple GPUs, or on a CPU. The Q8_0 build gives the same
+  answer as these weights on 228 of 231 public JevBench items.
+- **[JevK5-2B](https://huggingface.co/alibiserikbay/JevK5-2B)**: the same recipe on Qwen3.5-2B, at
+  half the memory (3.5 GB); 0.751 against this model's 0.804 on held-out teacher questions.
+
 ## Independent evaluation: JevBench v1.4
 
 [JevBench](https://github.com/fstandhartinger/jevbench) ranks JevK5 v0.2 **#2 of 76 systems and

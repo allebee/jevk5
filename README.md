@@ -108,6 +108,39 @@ curl -s localhost:8090/v1/systemone -d '{"state": "Order #7120 shows delivered t
 `flash-linear-attention` (the `fast` extra) speeds up long inputs; without it, Qwen3.5's
 linear-attention layers fall back to transformers' PyTorch code.
 
+## Run it on any GPU, a Mac, or a CPU
+
+GGUF builds for [llama.cpp](https://github.com/ggml-org/llama.cpp), which runs on NVIDIA, AMD,
+Intel and Apple GPUs and on plain CPUs, are in
+[JevK5-GGUF](https://huggingface.co/alibiserikbay/JevK5-GGUF), next to a smaller
+[JevK5-2B](https://huggingface.co/alibiserikbay/JevK5-2B) trained the same way. Each file was
+checked against its unquantized model on the 231 public items:
+
+| File | Size | Same answer as bf16 | Hard tier (bf16) |
+|---|---:|---:|---:|
+| `jevk5-4b-v0.2-Q8_0.gguf` | 4.48 GB | 228 / 231 | 0.721 (0.739) |
+| `jevk5-4b-v0.2-Q4_K_M.gguf` | 2.71 GB | 219 / 231 | 0.730 (0.739) |
+| `jevk5-2b-v0.2-Q8_0.gguf` | 2.01 GB | 226 / 231 | 0.622 (0.604) |
+
+```bash
+llama-server --hf-repo alibiserikbay/JevK5-GGUF --hf-file jevk5-4b-v0.2-Q8_0.gguf -c 8192 -ngl 99
+pip install --no-deps "jevk5 @ git+https://github.com/allebee/jevk5@v0.2.1"   # standard library only
+```
+
+```python
+from jevk5 import JevK5GGUF
+
+model = JevK5GGUF()                 # llama-server on :8080; JevK5GGUF(temperature=1.42) for the 2B
+model.decide("Order #7120 shows delivered to No. 17; the customer lives at No. 71.",
+             {"type": "choice", "instructions": "What happened to the parcel?",
+              "criteria": ["delivered", "misdelivered", "unknown"]})
+```
+
+It reads the answer letters' log-probabilities from `llama-server`: the same readout as the CUDA
+runtime, and on identical tokens the same probabilities. `bench/gguf_check.py` repeats the
+231-item comparison on your own machine. Measured so far: about 0.25 s (2B) and 0.6 s (4B) per short
+decision on a CPU alone, and 0.6 s for the 4B on an M1 Pro; consumer GPUs are not measured yet.
+
 ## How it was made
 
 1. **Teacher data** ([training/teacher.py](training/teacher.py)): Qwen3.6-27B with thinking writes

@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.2.1
+
+- **GGUF builds and a 2B model.** [JevK5-GGUF](https://huggingface.co/alibiserikbay/JevK5-GGUF)
+  holds JevK5 v0.2 at Q8_0 and Q4_K_M and JevK5-2B at Q8_0, for llama.cpp on almost any GPU or a
+  CPU; [JevK5-2B](https://huggingface.co/alibiserikbay/JevK5-2B) is the v0.2 recipe on
+  Qwen3.5-2B (temperature 1.42). The weights of JevK5 v0.2 itself are unchanged.
+- `jevk5.JevK5GGUF`: the same readout through `llama-server`, standard library only, and
+  `bench/gguf_check.py` to compare a GGUF with the bf16 model on the public items. The prompt and
+  option mapping moved to `jevk5/prompt.py`, which imports no torch; `import jevk5` no longer loads
+  torch until `JevK5` is used.
+- A 2B Q4_K_M was built and not published: it changed 29 of 231 answers and hard-tier accuracy fell
+  from 0.604 to 0.514.
+
 ## Correction, 2026-09-23
 
 JevBench's v1.4 scan noted that our hand-written calibration set
