@@ -94,6 +94,16 @@ def test_sequence_layout(lite):
     assert ids[s - 1] == lite.tok.sep_token_id
 
 
+def test_long_label_schema_is_answered_as_trained(lite):
+    """Labels are never cut: a schema past max_len extends the sequence, and the text keeps 16 tokens."""
+    labels = [f"label{i}" for i in range(50)]
+    heads = [("intent", labels, False, None)]
+    ids, label_pos, _, (s, e) = lite.encode(" ".join(["refund"] * 40), heads)
+    assert len(ids) > lite.max_len and len(label_pos) == 50 and e - s == 16
+    out = lite.classify(" ".join(["refund"] * 40), {"intent": labels})["intent"]["probabilities"]
+    assert list(out) == labels and math.isclose(sum(out.values()), 1.0, rel_tol=1e-5)
+
+
 def test_probabilities_match_a_manual_readout(lite):
     heads = [("intent", TASKS["intent"], False, None)]
     ids, label_pos, _, (s, e) = lite.encode("refund please", heads)

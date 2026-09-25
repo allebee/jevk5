@@ -12,10 +12,10 @@ Mapping, one JevK5-Lite head per question:
   If two options would get the same label, every label of that question becomes "<id>: <text>".
   The answer is JevK5-Lite's calibrated softmax over those labels, mapped back to the option ids.
 
-Length: JevK5-Lite reads at most 512 tokens and puts the task and the labels first. The state is cut from
-its end to fit whatever room is left, so a long document is mostly unread; the number of state tokens
-dropped is kept in raw["truncated_state_tokens"]. If the task and labels alone do not fit, the runtime
-raises and the item is recorded as a failure (none of the 231 public items comes close: at most 165 tokens).
+Length: JevK5-Lite puts the task and the labels first, then as much of the state as fits in 512 tokens
+(at least 16 tokens of it). The state is cut from its end, so a long document is mostly unread; the number
+of state tokens dropped is kept in raw["truncated_state_tokens"]. Labels are never cut: a label list longer
+than the window extends the sequence past 512 tokens, as in training. Nothing is refused for length.
 CPU by default: JEVK5_LITE_THREADS (default 16) and JEVK5_LITE_DTYPE (fp32 or bf16; default fp32) set
 the runtime.
 """

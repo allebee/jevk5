@@ -268,7 +268,7 @@ label sets in one encoder pass, on a CPU. It returns a calibrated probability pe
 single-label heads and a sigmoid for multi-label heads.
 
 ```bash
-pip install "jevk5[lite] @ git+https://github.com/allebee/jevk5@v0.3.1"
+pip install "jevk5[lite] @ git+https://github.com/allebee/jevk5@v0.3.2"
 ```
 
 ```python
@@ -314,6 +314,22 @@ CPU only (bf16, 16 threads), against JevK5 v0.2 on an H100:
 | distance to the gold distributions (10 probability items, TVD) | 0.310 | 0.196 |
 | p50 latency, easy and standard / hard | 71 / 205 ms | 13.5 / 30 ms |
 
+Per-item results are in
+[results/public231/jevk5-lite-preview1.jsonl](results/public231/jevk5-lite-preview1.jsonl). To rerun them:
+
+```bash
+pip install "jevk5[lite] @ git+https://github.com/allebee/jevk5@v0.3.2"
+cp bench/jevk5_lite.py <jevbench>/jevbench/adapters/
+cd <jevbench> && git apply <jevk5>/bench/jevbench-registration.patch   # registers jevk5_direct and jevk5_lite
+JEVK5_LITE_DTYPE=bf16 JEVK5_LITE_THREADS=16 CUDA_VISIBLE_DEVICES= python -m jevbench.cli run --adapter jevk5_lite \
+    --endpoint alibiserikbay/JevK5-Lite --revision 315ee211f828a899161477c534cea23e84ba3568 \
+    --model jevk5-lite-preview1 --tasks <tasks.jsonl> --results <out.jsonl> ...
+```
+
+That revision is the `preview-1` tag. The run above read the same files from a local folder: the weights, scorer,
+tokenizer and configs are byte-identical. `JEVK5_LITE_DTYPE` defaults to fp32, which works on any CPU; bf16 needs
+AMX or AVX512-BF16 to be fast.
+
 **Decision Index.** Every index question is a `choice` with 2 to 255 options, and a row can hold several questions.
 One `classify` call answers a whole row, one head per question:
 
@@ -350,12 +366,18 @@ def answer_row(row: dict) -> dict:
 |---|---|
 | Free-form numbers | Not asked by either benchmark (every question has typed options); JevK5-Lite cannot produce one. |
 | Distribution targets (JevBench's 10 probability items) | Mapped: the softmax over the options is the distribution. TVD 0.310, against the 4B's 0.196. |
-| More than 16 options | Mapped: there is no letter limit, and every option is scored in one pass. Labels come first within 512 tokens, so a long option list leaves less room for the text. |
-| Option lists too long for the window | Refused, scoring 0. If the task and label names alone need more than 509 tokens, the runtime raises instead of truncating labels. The index's BANKING77 label set (77 intents) needs 521, so those rows are refused; CLINC150 (151 short intents, 466 tokens) and MASSIVE (299) fit. |
+| More than 16 options, and long option lists | Mapped: there is no letter limit, and every option is scored in one pass. Labels come first, and the text keeps at least 16 tokens; a label list longer than the window extends the sequence past 512 tokens (see the note below). The index's BANKING77 rows (77 intents, 521 tokens of labels) are answered, not refused. |
 | Several questions in one row | Mapped: one head per question, in one pass. The questions share the 512-token budget. |
 | Documents past 512 tokens | Truncated: the state is cut from its end. On JevBench this hit 52 of the 111 hard items (median state 2,188 tokens); accuracy on them is 0.346, against 0.458 on the other hard items. |
 | Multi-step reasoning, dates and numbers | Answered, but weakly: hard-tier multi-hop 0.11 and temporal and numeric 0.27. It is a classifier with no reasoning step. |
 | Malformed questions (a choice with fewer than two options) | Refused by the runtime, recorded as a failure, and scored 0. None of the 231 public items was refused. |
+
+**Long label sets.** When the task and label names need more than about 500 tokens, the sequence runs past 512
+tokens instead of cutting labels. That is fine for this DeBERTa-v3 model, which has no absolute position
+embeddings (`position_biased_input` is false) and uses relative attention with 256 log-scale buckets. It is
+also how the model was trained: about 10% of training heads carried their full label set, for example all 151
+CLINC150 intents. And it is how the full-label check on held-out BANKING77 items (77 labels, 0.840) was run.
+Only the text is truncated, never a label.
 
 JevK5-Lite runs on a CPU, which is what it is for. Every number above is from a CPU with 16 threads.
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.2
+
+- Adds `bench/jevk5_lite.py`, the JevBench adapter for JevK5-Lite; the registration patch
+  (`bench/jevbench-registration.patch`) now covers both adapters. Nothing changes for JevK5 or JevK5-9B.
+- The README's JevK5-Lite section adds its JevBench public-231 table, the Decision Index mapping and a
+  coverage list. JevK5-Lite answers long label sets as it was trained: the text keeps at least 16 tokens and
+  the labels are never cut.
+
 ## 0.3.1
 
 - Adds the optional JevK5Lite (`pip install "jevk5[lite]"`); changes nothing for JevK5 or JevK5-9B.
