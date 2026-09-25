@@ -8,8 +8,8 @@ the TypeSafe-style `/v1/systemone` request shape. JevK5 is not affiliated with T
 
 **v0.3** (runtime 0.3.0): five times the teacher data from two teachers, replay from public train
 splits only, and a new [JevK5-9B](https://huggingface.co/alibiserikbay/JevK5-9B). See
-[What changed in v0.3](#what-changed-in-v03); the gains are on held-out and index-style data,
-and JevBench's hard tier is flat for the 4B.
+[What changed in v0.3](#what-changed-in-v03). Most of the gains are on held-out and index-style
+data; on JevBench's public items the 4B gains on the hard tier and loses one standard item.
 
 **Independent result:** [JevBench v1.4](https://github.com/fstandhartinger/jevbench) ranks JevK5
 v0.2 **second of 76 systems and first among open entrants** (62.04; Jev 1.13.0: 63.29). On its 308
@@ -61,22 +61,25 @@ published real-world workflows has not yet been measured.
 | | v0.2 | **v0.3 (4B)** | **JevK5-9B (v0.3)** |
 |---|---:|---:|---:|
 | Teacher questions | 3,272 (Qwen3.6-27B) | 17,408 (Qwen3.6-27B + GPT-6 Luna) | same |
-| Public replay | 3,272 items, 7 datasets | 32,425 items, 27 train splits | same |
-| Index proxy (our estimate) | 0.620 | 0.740 | 0.788 |
-| Held-out teacher questions | 0.804 | 0.815 | 0.865 |
-| Hand-written hard set | 0.769 | 0.797 | 0.844 |
-| bev-decision-150K test sample | 0.665 | 0.670 | 0.695 |
-| JevBench public, hard tier | 0.739 | 0.748 | 0.757 |
-| Temperature | 1.532 | 1.367 | 1.089 |
+| Public replay | 3,272 items, 7 datasets | 30,052 items, 26 train splits | same |
+| Index proxy (our estimate) | 0.620 | 0.731 | 0.762 |
+| Held-out teacher questions | 0.801 | 0.834 | 0.851 |
+| Hand-written hard set | 0.766 | 0.766 | 0.781 |
+| bev-decision-150K test sample | 0.665 | 0.663 | 0.700 |
+| JevBench public, hard tier | 0.739 | 0.784 | 0.730 |
+| `temperature` / `knockout_temperature` | 1.532 / 0.77 | 1.22 / 0.93 | 1.049 / 1.2 |
+| License | Apache-2.0 | Apache-2.0 | Apache-2.0 |
 | GPU memory in bf16 | ~9 GB | ~9 GB | ~19 GB |
 
 - The **index proxy** is our own estimate, not an index score. It is the chance-corrected skill
-  averaged over held-out train-split rows of 16 Decision Index benchmarks (40 rows each).
+  averaged over held-out train-split rows of 16 Decision Index benchmarks (40 rows each). All
+  held-out numbers here are read through the runtime on the same dev set.
 - **bev-decision-150K** is another group's decision mix. We scored 4,723 questions from its test
   split, for evaluation only.
 - **No test split of any dataset** went into v0.3: the replay comes from train splits only, and
   every row was checked against the index benchmarks' test and validation text and against
-  JevBench's public items.
+  JevBench's public items. No split of MMLU or MMLU-Pro is used: MMLU's `auxiliary_train` was
+  dropped because most of it is RACE, which is for non-commercial research only.
 - The full data list with licenses, the declared overlap with the Decision Index, and the weak
   spots are on the model cards: [JevK5](https://huggingface.co/alibiserikbay/JevK5) and
   [JevK5-9B](https://huggingface.co/alibiserikbay/JevK5-9B).
@@ -90,31 +93,30 @@ temperature; its answers match SemIf's official public outcomes on all 231 items
 | Split | n | Untrained Qwen3.5-4B | JevK5 v0.1 | JevK5 v0.2 | **JevK5 v0.3** | **JevK5-9B v0.3** |
 |---|---:|---:|---:|---:|---:|---:|
 | easy | 48 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 |
-| original (standard) | 72 | 0.986 | 0.958 | 0.958 | 0.972 | 0.944 |
-| hard (public half) | 111 | 0.613 | 0.676 | 0.739 | 0.748 | 0.757 |
-| hard-tier ECE | | 0.117 | 0.082 | 0.066 | 0.071 | 0.095 |
-| distance to the exact gold distributions | | 0.298 | 0.296 | 0.196 | 0.172 | 0.236 |
+| original (standard) | 72 | 0.986 | 0.958 | 0.958 | 0.944 | 0.944 |
+| hard (public half) | 111 | 0.613 | 0.676 | 0.739 | **0.784** | 0.730 |
+| hard-tier ECE | | 0.117 | 0.082 | 0.066 | **0.054** | 0.126 |
+| distance to the exact gold distributions | | 0.298 | 0.296 | 0.196 | **0.164** | 0.284 |
 
 Latency on one H100 (in-process, batch 1):
-- 4B: p50 13.6 ms, p95 14.9 ms on easy and standard items; p50 29 ms, p95 158 ms on hard items
+- 4B: p50 13.2 ms, p95 14.6 ms on easy and standard items; p50 30 ms, p95 162 ms on hard items
   with 1-4k-token documents.
-- JevK5-9B: p50 31 ms, p95 37 ms on easy and standard items; p50 82 ms, p95 327 ms on hard items.
+- JevK5-9B: p50 32 ms, p95 36 ms on easy and standard items; p50 74 ms, p95 373 ms on hard items.
   It was measured while another job shared the GPU.
 
 Per-item results are in [results/public231](results/public231). These are public-item numbers from
 our own runs, not an official JevBench score.
 
-**v0.3 (4B) against v0.2 on the hard tier:** 8 items fixed, 7 broken (McNemar p = 1.0), so the
-hard tier is flat.
-- Gains: probability 0.70 -> 0.90, multi-step lookups 0.78 -> 0.89, long policies 0.58 -> 0.68,
-  adversarial 0.83 -> 1.00.
-- Losses: judging answers 0.76 -> 0.59, dates and numbers 0.47 -> 0.33, ambiguous 0.86 -> 0.71.
+**v0.3 (4B) against v0.2 on the hard tier:** 10 items fixed, 5 broken (McNemar p = 0.30, not
+significant on 111 items). On the standard tier: 3 fixed, 4 broken.
+- Gains: probability 0.70 -> 1.00, adversarial 0.83 -> 1.00, long policies 0.58 -> 0.68,
+  multi-step lookups 0.78 -> 0.83.
+- Losses: judging answers 0.76 -> 0.65. Dates and numbers stay at 0.47.
 
 **JevK5-9B on these items:** against the untrained Qwen3.5-9B (easy 1.000, standard 0.958, hard
-0.676) it fixes 17 hard items and breaks 8. Against the v0.3 4B it fixes 6 hard items and breaks 5
-(p = 1.0), and on the standard tier it fixes 1 and breaks 3. Its hard-tier ECE (0.095) and
-distance to the gold distributions (0.236) are worse than the 4B's. On JevBench's public items
-the 9B is therefore not better than the 4B; its gains are on the held-out checks above.
+0.676) it fixes 15 hard items and breaks 9. **Against the v0.3 4B it is worse:** 4 hard items fixed
+and 10 broken, and its hard-tier ECE (0.126) and distance to the gold distributions (0.284) are
+worse than the 4B's. Its gains are on the held-out checks above, not on JevBench's public items.
 
 **v0.2 against the untrained model and v0.1:** on the hard tier v0.2 fixes 21 of the untrained
 model's items and breaks 7 (McNemar p = 0.013); against v0.1 it fixes 9 and breaks 2. Per family,
@@ -123,11 +125,11 @@ policies 0.47 -> 0.58, multi-step lookups 0.72 -> 0.78 and dates and numbers 0.4
 answers slips 0.82 -> 0.76 (one item).
 
 **Known weak spots:**
-- v0.3's hard-tier calibration is slightly worse than v0.2's (ECE 0.071 against 0.066), and the
-  9B's is worse again (0.095).
-- For the 4B, the temperature is fitted on hard questions, so standard-tier confidence is too low
-  (ECE 0.117 for v0.3, 0.141 for v0.2).
-- JevK5-9B drops two standard-tier items against the 4B (0.944 against 0.972).
+- v0.3 (4B) gets one standard-tier item fewer than v0.2 (0.944 against 0.958); its standard-tier
+  calibration is much better (ECE 0.057 against 0.141).
+- Judging answers is the one hard-tier family that got worse (0.76 -> 0.65).
+- JevK5-9B is behind the 4B on the hard tier (0.730 against 0.784) and badly calibrated there
+  (ECE 0.126).
 
 ## Install and use
 
@@ -168,8 +170,11 @@ retraining:
 3. Finalists keep the final's distribution, times the chance the answer is among them. Every other
    option gets its group's share of the final times its in-group probability.
 4. The letter temperature is fitted on questions of up to 16 options and leaves this combination
-   underconfident, so it is sharpened by a second temperature, 0.77. That value was fitted on
-   MASSIVE's train split, which is not a Decision Index benchmark. It never changes the answer.
+   miscalibrated, so it is sharpened by a second temperature. Since 0.3.0 each model carries its
+   own, `knockout_temperature` in its `jevk5_config.json` (v0.3 4B: 0.93, JevK5-9B: 1.2). A
+   config without it (v0.2) keeps 0.77, and `knockout_temperature=` in `JevK5` or `JevK5GGUF`
+   overrides both. Every value is fitted on 500 items of MASSIVE's train split, which is not a
+   Decision Index benchmark. It never changes the answer.
 
 That is ceil(n / 16) + 1 passes. `JevK5GGUF` combines its passes the same way
 ([jevk5/prompt.py](jevk5/prompt.py)). On train splits, with every intent offered in the Decision
@@ -182,19 +187,18 @@ Index's request shape, 500 items each and none that v0.2 trained on
 | BANKING77 | 77 | 6 | 0.690 | 0.674 | 0.039 | 116 ms |
 | CLINC150 with out-of-scope | 151 | 11 | 0.666 | 0.720 | 0.039 | 199 ms |
 
-v0.3, on the same items (none of them in v0.3's training or dev data), with the same second
-temperature:
+v0.3, on the same items (none of them in v0.3's training or dev data), each model with its own
+second temperature (MASSIVE is the fitting set; BANKING77 and CLINC150 are only reported):
 
 | Train split | v0.3 (4B) accuracy / macro-F1 / ECE | JevK5-9B accuracy / macro-F1 / ECE |
 |---|---:|---:|
-| MASSIVE en-US | 0.768 / 0.757 / 0.025 | 0.808 / 0.806 / 0.087 |
-| BANKING77 | 0.636 / 0.620 / 0.075 | 0.730 / 0.720 / 0.118 |
-| CLINC150 with out-of-scope | 0.706 / 0.741 / 0.068 | 0.772 / 0.807 / 0.088 |
+| MASSIVE en-US | 0.738 / 0.724 / 0.045 | 0.818 / 0.815 / 0.036 |
+| BANKING77 | 0.652 / 0.632 / 0.044 | 0.734 / 0.722 / 0.044 |
+| CLINC150 with out-of-scope | 0.700 / 0.759 / 0.056 | 0.780 / 0.815 / 0.061 |
 
-v0.3 (4B) is better than v0.2 on CLINC150 and MASSIVE. It is worse on BANKING77, where it is also
-overconfident. The 0.77 was fitted for v0.2 and is unchanged. JevK5-9B is the most accurate here but
-overconfident. The 0.77 was fitted for the 4B, and the 9B's passes combined at 1.0 give ECE 0.039,
-0.056 and 0.050. The runtime does not yet support a second temperature per model.
+The v0.3 4B is better than v0.2 on CLINC150 (0.666 -> 0.700), and worse on MASSIVE (0.754 ->
+0.738) and BANKING77 (0.690 -> 0.652). With v0.2's 0.77 instead of its own 0.93 it would be
+overconfident (ECE 0.070, 0.101, 0.073). JevK5-9B (second temperature 1.2) is 8 points more accurate than the 4B on each set.
 
 The alternative we built, `method="tree"`, reads one pass whose letters stand for whole groups. It
 scored 0.636 on BANKING77 and 0.584 on CLINC150, and is kept only to reproduce the comparison.
@@ -203,8 +207,7 @@ Through llama.cpp, the Q8_0 file gives the same answer as bf16 on 95 of 100 BANK
 
 **Weak spot: out of scope.** On CLINC150, "none of the listed intents" reaches the final in all 91
 out-of-scope items but wins it in only 33. It also wins in 58 in-scope items, which leaves recall
-and precision at 0.36 each (v0.2). v0.3 (4B) recalls 0.37 with precision 0.62. JevK5-9B recalls 0.43
-with precision 0.74.
+and precision at 0.36 each (v0.2). v0.3 (4B) recalls 0.27 with precision 0.58. JevK5-9B recalls 0.46 with precision 0.76.
 
 As a server:
 
@@ -226,18 +229,18 @@ Intel and Apple GPUs and on plain CPUs, are in
 [JevK5-2B](https://huggingface.co/alibiserikbay/JevK5-2B) trained with the v0.2 recipe. Each file
 was checked against its unquantized model on the 231 public items:
 
-| File | Size | Same answer as bf16 | Hard tier (bf16) | Temperature |
+| File | Size | Same answer as bf16 | Hard tier (bf16) | `temperature` / `knockout_temperature` |
 |---|---:|---:|---:|---:|
-| `jevk5-4b-v0.3-Q8_0.gguf` | 4.48 GB | 228 / 231 | 0.730 (0.748) | 1.367 |
-| `jevk5-4b-v0.3-Q5_K_M.gguf` | 3.07 GB | 221 / 231 | 0.730 (0.748) | 1.367 |
-| `jevk5-9b-v0.3-Q8_0.gguf` | 9.53 GB | 228 / 231 | 0.766 (0.757) | 1.089 |
-| `jevk5-9b-v0.3-Q5_K_M.gguf` | 6.47 GB | 224 / 231 | 0.757 (0.757) | 1.089 |
-| `jevk5-4b-v0.2-Q8_0.gguf` | 4.48 GB | 228 / 231 | 0.721 (0.739) | 1.532 |
-| `jevk5-4b-v0.2-Q4_K_M.gguf` | 2.71 GB | 219 / 231 | 0.730 (0.739) | 1.532 |
-| `jevk5-2b-v0.2-Q8_0.gguf` | 2.01 GB | 226 / 231 | 0.622 (0.604) | 1.42 |
+| `jevk5-4b-v0.3-Q8_0.gguf` | 4.48 GB | 229 / 231 | 0.784 (0.784) | 1.22 / 0.93 |
+| `jevk5-4b-v0.3-Q5_K_M.gguf` | 3.07 GB | 224 / 231 | 0.784 (0.784) | 1.22 / 0.93 |
+| `jevk5-4b-v0.3-Q4_K_M.gguf` | 2.71 GB | 221 / 231 | 0.766 (0.784) | 1.22 / 0.93 |
+| `jevk5-9b-v0.3-Q8_0.gguf` | 9.53 GB | 229 / 231 | 0.721 (0.730) | 1.049 / 1.2 |
+| `jevk5-9b-v0.3-Q5_K_M.gguf` | 6.47 GB | 225 / 231 | 0.703 (0.730) | 1.049 / 1.2 |
+| `jevk5-4b-v0.2-Q8_0.gguf` | 4.48 GB | 228 / 231 | 0.721 (0.739) | 1.532 / 0.77 |
+| `jevk5-4b-v0.2-Q4_K_M.gguf` | 2.71 GB | 219 / 231 | 0.730 (0.739) | 1.532 / 0.77 |
+| `jevk5-2b-v0.2-Q8_0.gguf` | 2.01 GB | 226 / 231 | 0.622 (0.604) | 1.42 / 0.77 |
 
-A v0.3 4B Q4_K_M changed 17 of 231 answers and is not published. Neither is the 9B Q4_K_M (218 of
-231 the same).
+The 9B Q4_K_M changed 13 of 231 answers and is not published.
 
 ```bash
 llama-server --hf-repo alibiserikbay/JevK5-GGUF --hf-file jevk5-4b-v0.3-Q8_0.gguf -c 8192 -ngl 99
@@ -247,7 +250,7 @@ pip install --no-deps "jevk5 @ git+https://github.com/allebee/jevk5@v0.3.0"   # 
 ```python
 from jevk5 import JevK5GGUF
 
-model = JevK5GGUF(temperature=1.367)  # llama-server on :8080; use the file's temperature (table)
+model = JevK5GGUF(temperature=1.22, knockout_temperature=0.93)   # the file's values (table)
 model.decide("Order #7120 shows delivered to No. 17; the customer lives at No. 71.",
              {"type": "choice", "instructions": "What happened to the parcel?",
               "criteria": ["delivered", "misdelivered", "unknown"]})
@@ -270,16 +273,16 @@ decision on a CPU alone, and 0.6 s for the 4B on an M1 Pro; consumer GPUs are no
    (`--provider openai`). Its families are dates and numbers, rubrics, ambiguity, multi-step
    lookups, causal and plausibility judgements, stance and sarcasm, tool choice, and paraphrases
    of Qwen questions. Those outputs are subject to OpenAI's terms.
-2. **Replay** (v0.3): 32,425 human-labelled items from the train splits of 27 public datasets,
+2. **Replay** (v0.3): 30,052 human-labelled items from the train splits of 26 public datasets,
    listed with their licenses on the model card. No test or validation split of any dataset is
    used. Every row is checked against the Decision Index benchmarks' test and validation text and
    JevBench's public items (exact match or any shared 8-word sequence).
 3. **Training** ([training/lora.py](training/lora.py)): LoRA rank 16 on attention projections,
-   cross-entropy on the option-letter logits, lr 3e-5. v0.3: 17,408 teacher questions + 32,425
+   cross-entropy on the option-letter logits, lr 3e-5. v0.3: 17,408 teacher questions + 30,052
    replay items, 1 epoch. v0.2: 3,272 + 3,272, 2 epochs. v0.2's replay included MMLU-Pro test
    items; see [the correction](CHANGELOG.md). A question that carries an exact distribution trains
    against it rather than a single letter.
-4. **Calibration:** one temperature (v0.3: 1.367 for the 4B and 1.089 for the 9B; v0.2: 1.532),
+4. **Calibration:** one temperature (v0.3: 1.22 for the 4B and 1.049 for the 9B; v0.2: 1.532),
    fitted on teacher questions from three domains that training never saw. A temperature per
    question type and averaging two option orders were both measured on held-out data and rejected
    ([training/temp_choice.py](training/temp_choice.py),

@@ -23,15 +23,14 @@ This product includes software and model weights developed by others:
     the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
 
 - Training replay data, under their own licenses:
-  - v0.3 (train splits only): MMLU auxiliary_train (MIT; it collects ARC, OpenBookQA, MCTest and
-    RACE items, and RACE's terms limit it to non-commercial research), GSM8K (MIT), WinoGrande
-    (Apache-2.0), HellaSwag (MIT), When2Call (CC BY 4.0), HoVer (CC BY-SA 4.0, with Wikipedia
-    introductions, CC BY-SA), iSarcasmEval (MIT), ARC (CC BY-SA 4.0), CommonsenseQA (MIT), CLINC150
-    (CC BY 3.0), Schema-Guided Dialogue (CC BY-SA 4.0), Amazon ESCI (Apache-2.0), RAGTruth (MIT),
-    ToolACE (Apache-2.0), WANLI (CC BY 4.0), AQuA-RAT (Apache-2.0), OpenBookQA (Apache-2.0),
-    Cosmos QA (CC BY 4.0), SWAG (MIT), BoolQ (CC BY-SA 3.0), MultiNLI (OANC / CC BY 3.0 /
-    CC BY-SA 3.0 / MIT by genre), BANKING77 (CC BY 4.0), MASSIVE (CC BY 4.0), the New Yorker
-    caption contest (CC BY 4.0), QASC (CC BY 4.0), RuleTaker (Apache-2.0) and Glaive function
-    calling v2 (Apache-2.0).
+  - v0.3, JevK5 and JevK5-9B (train splits only; no MMLU, MMLU-Pro, ANLI or NLI4CT): GSM8K (MIT),
+    WinoGrande (Apache-2.0), HellaSwag (MIT), When2Call (CC BY 4.0), HoVer (CC BY-SA 4.0, with
+    Wikipedia introductions, CC BY-SA), iSarcasmEval (MIT), ARC (CC BY-SA 4.0), CommonsenseQA (MIT),
+    CLINC150 (CC BY 3.0), Schema-Guided Dialogue (CC BY-SA 4.0), Amazon ESCI (Apache-2.0), RAGTruth
+    (MIT), ToolACE (Apache-2.0), WANLI (CC BY 4.0), AQuA-RAT (Apache-2.0), OpenBookQA (Apache-2.0),
+    Cosmos QA (CC BY 4.0), SWAG (MIT), BoolQ (CC BY-SA 3.0), MultiNLI (OANC / CC BY 3.0 / CC BY-SA
+    3.0 / MIT by genre), BANKING77 (CC BY 4.0), MASSIVE (CC BY 4.0), the New Yorker caption contest
+    (CC BY 4.0), QASC (CC BY 4.0), RuleTaker (Apache-2.0) and Glaive function calling v2
+    (Apache-2.0).
   - v0.1 and v0.2: MMLU-Pro (MIT), WANLI (CC BY 4.0), MultiNLI, BoolQ (CC BY-SA 3.0), banking77
     (CC BY 4.0), ARC (CC BY-SA 4.0) and CommonsenseQA (MIT).

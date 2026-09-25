@@ -3,48 +3,55 @@
 ## 0.3.0
 
 - **JevK5 v0.3 weights** at [alibiserikbay/JevK5](https://huggingface.co/alibiserikbay/JevK5)
-  (Qwen3.5-4B, temperature 1.367). v0.2 stays available under the Hub tag `v0.2`.
+  (Qwen3.5-4B, temperature 1.22, Apache-2.0). v0.2 stays available under the Hub tag `v0.2`.
   - Teacher data is five times larger and comes from two teachers: 17,408 questions (v0.2's 3,270
     from Qwen3.6-27B, plus 14,138 from GPT-6 Luna).
-  - Replay is 32,425 items from the train splits of 27 public datasets. No test or validation
-    split of any dataset is used, and MMLU-Pro and BBH are not used at all (see the 2026-09-24
-    correction below). Every row is checked against the Decision Index benchmarks' test and
-    validation text and JevBench's public items.
-  - One epoch over 49,833 rows.
+  - Replay is 30,052 items from the train splits of 26 public datasets. No test or validation
+    split of any dataset is used, and MMLU, MMLU-Pro and BBH are not used at all (see the
+    2026-09-24 correction below). Every row is checked against the Decision Index benchmarks'
+    test and validation text and JevBench's public items.
+  - One epoch over 47,460 rows.
 - **New: [JevK5-9B](https://huggingface.co/alibiserikbay/JevK5-9B)**, the same data and recipe on
-  Qwen3.5-9B (temperature 1.089).
-- **Held-out checks, v0.2 → v0.3 4B → 9B:**
-  - index proxy 0.620 → 0.740 → 0.788
-  - held-out teacher questions 0.804 → 0.815 → 0.865
-  - hand-written hard set 0.769 → 0.797 → 0.844
-  - bev-decision-150K test sample 0.665 → 0.670 → 0.695
+  Qwen3.5-9B (temperature 1.049, Apache-2.0).
+- **Held-out checks, v0.2 → v0.3 4B → 9B** (same dev set and readout):
+  - index proxy 0.620 → 0.731 → 0.762
+  - held-out teacher questions 0.801 → 0.834 → 0.851
+  - hand-written hard set 0.766 → 0.766 → 0.781
+  - bev-decision-150K test sample 0.665 → 0.663 → 0.700
 - **JevBench public (231), v0.2 → v0.3 4B → 9B:**
-  - hard tier 0.739 → 0.748 → 0.757
-  - standard 0.958 → 0.972 → 0.944
-  - hard-tier ECE 0.066 → 0.071 → 0.095
-  - The 4B's hard tier is flat against v0.2 (8 items fixed, 7 broken). Judging answers
-    (0.76 → 0.59) and dates and numbers (0.47 → 0.33) got worse.
-  - The 9B is not better than the 4B on these items: 6 hard items fixed, 5 broken, and 2 fewer
-    standard items right.
-- **More than 16 options, 4B v0.2 → v0.3:**
-  - CLINC150 0.666 → 0.706
-  - MASSIVE 0.754 → 0.768
-  - BANKING77 0.690 → 0.636, and its ECE 0.039 → 0.075. The second temperature (0.77) is
-    unchanged.
-- **More than 16 options, JevK5-9B:** MASSIVE 0.808, BANKING77 0.730, CLINC150 0.772. But with the
-  shared second temperature (0.77) its probabilities are overconfident (ECE 0.087, 0.118, 0.088).
-  At 1.0 the same passes give 0.039, 0.056 and 0.050. The runtime does not yet take a second
-  temperature per model.
+  - hard tier 0.739 → 0.784 → 0.730
+  - standard 0.958 → 0.944 → 0.944
+  - hard-tier ECE 0.066 → 0.054 → 0.126
+  - Against v0.2, the 4B fixes 10 hard items and breaks 5 (not significant, p = 0.30). Judging
+    answers got worse (0.76 → 0.65).
+  - The 9B is worse than the 4B on these items: 4 hard items fixed and 10 broken, with a
+    hard-tier ECE of 0.126.
+- **Per-model second temperature for more than 16 options.** `JevK5` and `JevK5GGUF` read an
+  optional `knockout_temperature` from `jevk5_config.json`, and a `knockout_temperature=`
+  argument overrides it. Without either they keep 0.77, so v0.2 is bit-identical to 0.2.2 (231/231
+  public items, and the >16-option distributions). Each value is fitted by NLL on 500 MASSIVE
+  en-US train items: v0.3 4B 0.93, JevK5-9B 1.2.
+- **More than 16 options, 4B v0.2 → v0.3**, each with its own second temperature:
+  - CLINC150 0.666 → 0.700 (ECE 0.039 → 0.056)
+  - MASSIVE 0.754 → 0.738 (ECE 0.038 → 0.045; the fitting set)
+  - BANKING77 0.690 → 0.652 (ECE 0.039 → 0.044)
+- **More than 16 options, JevK5-9B** (second temperature 1.2): MASSIVE 0.818, BANKING77 0.734,
+  CLINC150 0.780 (ECE 0.036, 0.044, 0.061). That is 8 points above the 4B on each set.
 - **GGUF**, answers the same as bf16 on the 231 public items:
-  - v0.3 4B: Q8_0 228/231, Q5_K_M 221/231.
-  - 9B: Q8_0 228/231, Q5_K_M 224/231.
-  - Not published, below 95%: the v0.3 4B Q4_K_M (214/231) and the 9B Q4_K_M (218/231).
-- **Runtime:** unchanged apart from the version number; 0.2.2 already loads v0.3 and the 9B.
-  `JevK5GGUF()` still defaults to v0.2's temperature (1.532). With v0.3 files, pass
-  `temperature=1.367` (4B) or `temperature=1.089` (9B).
-- **Licensing:** a development variant that also trained on ANLI (CC BY-NC 4.0) and NLI4CT (no
-  stated license) is not released. The released models' data sources and licenses are listed on
-  their cards.
+  - v0.3 4B: Q8_0 229/231, Q5_K_M 224/231, Q4_K_M 221/231.
+  - 9B: Q8_0 229/231, Q5_K_M 225/231.
+  - Not published, below 95%: the 9B Q4_K_M (218/231).
+- **Runtime:** apart from `knockout_temperature`, unchanged. 0.2.2 loads v0.3 and the 9B too,
+  but uses 0.77 for more than 16 options. `JevK5GGUF()` still defaults to v0.2's values (1.532,
+  0.77). With v0.3 files, pass `JevK5GGUF(temperature=1.22, knockout_temperature=0.93)` for the 4B
+  or `JevK5GGUF(temperature=1.049, knockout_temperature=1.2)` for the 9B.
+- **Licensing:** two development variants are not released because of their data's terms. One
+  also trained on ANLI (CC BY-NC 4.0) and NLI4CT (no stated license). The other also trained on
+  MMLU's `auxiliary_train`, which is mostly RACE (non-commercial research only).
+  - At 4B that variant was level with the released model: index proxy 0.740 against 0.731,
+    teacher questions 0.820 against 0.834.
+  - At 9B it scored higher than the released JevK5-9B: index proxy 0.788 against 0.762, teacher
+    questions 0.870 against 0.851, hand-written set 0.844 against 0.781.
 
 ## 0.2.2
 
