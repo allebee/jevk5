@@ -6,12 +6,21 @@ It returns a probability for every option in one forward pass, with zero generat
 [weights](https://huggingface.co/alibiserikbay/JevK5) run on your own GPU, and the server accepts
 the TypeSafe-style `/v1/systemone` request shape. JevK5 is not affiliated with TypeSafe AI.
 
+**v0.3** (runtime 0.3.0): five times the teacher data from two teachers, replay from public train
+splits only, and a new [JevK5-9B](https://huggingface.co/alibiserikbay/JevK5-9B). See
+[What changed in v0.3](#what-changed-in-v03); the gains are on held-out and index-style data,
+and JevBench's hard tier is flat for the 4B.
+
 **Independent result:** [JevBench v1.4](https://github.com/fstandhartinger/jevbench) ranks JevK5
-v0.2 **second of 76 systems and first among open entrants** (62.04; Jev 1.13.0: 63.29). On its
-308 fresh sealed decisions, JevK5 answered 33.1% correctly and Jev answered 36.7%; the
-[evaluator calls this set unusually difficult](https://github.com/fstandhartinger/jevbench/blob/main/docs/METHOD-v1.4.md).
-The ranking measures JevBench's mix of accuracy, calibration, speed, and cost, not performance on
-every production workflow. JevK5's reported H100 latency is about 13 ms for short decisions.
+v0.2 **second of 76 systems and first among open entrants** (62.04; Jev 1.13.0: 63.29). On its 308
+fresh sealed decisions, JevK5 answered 33.1% correctly and Jev answered 36.7%; the [evaluator calls
+this set unusually
+difficult](https://github.com/fstandhartinger/jevbench/blob/main/docs/METHOD-v1.4.md). The ranking
+measures JevBench's mix of accuracy, calibration, speed, and cost, not performance on every
+production workflow. JevK5's reported H100 latency is about 13 ms for short decisions. On the [Jev
+Decision Index](https://huggingface.co/spaces/multimodalart/jev-decision-index), JevK5 0.2.2 (v0.2
+weights) scores 36.31, 15th of 49, with the 4th-best calibration. v0.3 has not been run by either
+benchmark yet.
 
 ## Watch it run
 
@@ -32,20 +41,45 @@ This game is not a Jev comparison.
 
 | | |
 |---|---|
-| Weights | [alibiserikbay/JevK5](https://huggingface.co/alibiserikbay/JevK5): Qwen3.5-4B + a distilled LoRA, merged (Apache-2.0) |
+| Weights | [alibiserikbay/JevK5](https://huggingface.co/alibiserikbay/JevK5): Qwen3.5-4B + a distilled LoRA, merged (Apache-2.0); [JevK5-9B](https://huggingface.co/alibiserikbay/JevK5-9B) on Qwen3.5-9B |
 | Readout | SemIf's protocol: a softmax over the answer letters' next-token logits, one temperature |
 | Runtime | One CUDA graph per padded input length: 13 ms vs ~70 ms eager on an H100, same answers |
-| Training | Distilled from Qwen3.6-27B with thinking, on hard decisions it wrote and checked twice |
+| Training | Distilled from Qwen3.6-27B and GPT-6 Luna, on hard decisions they wrote and checked twice, plus public train splits |
 
 ## How JevK5 differs from Jev
 
-JevK5 uses open Qwen3.5-4B weights and [SemIf's option-logit readout](https://github.com/TheoLeeCJ/SemIf),
-not Jev's unpublished model architecture. It supports the same three decision types—`noul`
-(yes/no), `choice`, and `score`—through a TypeSafe-style endpoint. Each question is evaluated
-separately; the server serializes requests on one GPU. The model is English-only, answers up to 16
-options in one pass and more in several (see [More than 16 options](#more-than-16-options)), and
-refuses inputs over 16,384 tokens. Its quality on Jev's published real-world workflows has not yet
-been measured.
+JevK5 uses open Qwen3.5-4B (or 9B) weights and [SemIf's option-logit
+readout](https://github.com/TheoLeeCJ/SemIf), not Jev's unpublished model architecture. It supports
+the same three decision types—`noul` (yes/no), `choice`, and `score`—through a TypeSafe-style
+endpoint. Each question is evaluated separately; the server serializes requests on one GPU. The
+model is English-only, answers up to 16 options in one pass and more in several (see [More than 16
+options](#more-than-16-options)), and refuses inputs over 16,384 tokens. Its quality on Jev's
+published real-world workflows has not yet been measured.
+
+## What changed in v0.3
+
+| | v0.2 | **v0.3 (4B)** | **JevK5-9B (v0.3)** |
+|---|---:|---:|---:|
+| Teacher questions | 3,272 (Qwen3.6-27B) | 17,408 (Qwen3.6-27B + GPT-6 Luna) | same |
+| Public replay | 3,272 items, 7 datasets | 32,425 items, 27 train splits | same |
+| Index proxy (our estimate) | 0.620 | 0.740 | 0.788 |
+| Held-out teacher questions | 0.804 | 0.815 | 0.865 |
+| Hand-written hard set | 0.769 | 0.797 | 0.844 |
+| bev-decision-150K test sample | 0.665 | 0.670 | 0.695 |
+| JevBench public, hard tier | 0.739 | 0.748 | 0.757 |
+| Temperature | 1.532 | 1.367 | 1.089 |
+| GPU memory in bf16 | ~9 GB | ~9 GB | ~19 GB |
+
+- The **index proxy** is our own estimate, not an index score. It is the chance-corrected skill
+  averaged over held-out train-split rows of 16 Decision Index benchmarks (40 rows each).
+- **bev-decision-150K** is another group's decision mix. We scored 4,723 questions from its test
+  split, for evaluation only.
+- **No test split of any dataset** went into v0.3: the replay comes from train splits only, and
+  every row was checked against the index benchmarks' test and validation text and against
+  JevBench's public items.
+- The full data list with licenses, the declared overlap with the Decision Index, and the weak
+  spots are on the model cards: [JevK5](https://huggingface.co/alibiserikbay/JevK5) and
+  [JevK5-9B](https://huggingface.co/alibiserikbay/JevK5-9B).
 
 ## Results on JevBench's public items
 
@@ -53,38 +87,59 @@ JevBench v1.2, 231 public items, through JevBench's own runner (`bench/jevk5_dir
 231/231 valid, 0 failures. "Untrained" is the same base model and prompt without the LoRA or the
 temperature; its answers match SemIf's official public outcomes on all 231 items.
 
-| Split | n | Untrained Qwen3.5-4B | JevK5 v0.1 | **JevK5 v0.2** |
-|---|---:|---:|---:|---:|
-| easy | 48 | 1.000 | 1.000 | **1.000** |
-| original (standard) | 72 | 0.986 | 0.958 | 0.958 |
-| hard (public half) | 111 | 0.613 | 0.676 | **0.739** |
-| hard-tier ECE | | 0.117 | 0.082 | **0.066** |
-| distance to the exact gold distributions | | 0.298 | 0.296 | **0.196** |
+| Split | n | Untrained Qwen3.5-4B | JevK5 v0.1 | JevK5 v0.2 | **JevK5 v0.3** | **JevK5-9B v0.3** |
+|---|---:|---:|---:|---:|---:|---:|
+| easy | 48 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 |
+| original (standard) | 72 | 0.986 | 0.958 | 0.958 | 0.972 | 0.944 |
+| hard (public half) | 111 | 0.613 | 0.676 | 0.739 | 0.748 | 0.757 |
+| hard-tier ECE | | 0.117 | 0.082 | 0.066 | 0.071 | 0.095 |
+| distance to the exact gold distributions | | 0.298 | 0.296 | 0.196 | 0.172 | 0.236 |
 
-Latency on one H100 (in-process, batch 1): p50 13.5 ms, p95 14.9 ms on easy and standard items;
-p50 30 ms, p95 161 ms on hard items with 1-4k-token documents. Per-item results are in
-[results/public231](results/public231). These are public-item numbers from our own runs, not an
-official JevBench score.
+Latency on one H100 (in-process, batch 1):
+- 4B: p50 13.6 ms, p95 14.9 ms on easy and standard items; p50 29 ms, p95 158 ms on hard items
+  with 1-4k-token documents.
+- JevK5-9B: p50 31 ms, p95 37 ms on easy and standard items; p50 82 ms, p95 327 ms on hard items.
+  It was measured while another job shared the GPU.
 
-On the hard tier v0.2 fixes 21 of the untrained model's items and breaks 7 (McNemar p = 0.013);
-against v0.1 it fixes 9 and breaks 2. Per family, the gains are probability 0.50 -> 0.70, ambiguous
-0.71 -> 0.86, trade-offs 0.83 -> 1.00, long policies 0.47 -> 0.58, multi-step lookups 0.72 -> 0.78
-and dates and numbers 0.40 -> 0.47; judging answers slips 0.82 -> 0.76 (one item).
+Per-item results are in [results/public231](results/public231). These are public-item numbers from
+our own runs, not an official JevBench score.
 
-**Known weak spots:** two standard-tier items that the untrained model answers correctly are wrong
-after training (an unchanged policy pair); the temperature is fitted on hard questions, so
-standard-tier confidence is now too low (ECE 0.141 there, against 0.066 on the hard tier).
+**v0.3 (4B) against v0.2 on the hard tier:** 8 items fixed, 7 broken (McNemar p = 1.0), so the
+hard tier is flat.
+- Gains: probability 0.70 -> 0.90, multi-step lookups 0.78 -> 0.89, long policies 0.58 -> 0.68,
+  adversarial 0.83 -> 1.00.
+- Losses: judging answers 0.76 -> 0.59, dates and numbers 0.47 -> 0.33, ambiguous 0.86 -> 0.71.
+
+**JevK5-9B on these items:** against the untrained Qwen3.5-9B (easy 1.000, standard 0.958, hard
+0.676) it fixes 17 hard items and breaks 8. Against the v0.3 4B it fixes 6 hard items and breaks 5
+(p = 1.0), and on the standard tier it fixes 1 and breaks 3. Its hard-tier ECE (0.095) and
+distance to the gold distributions (0.236) are worse than the 4B's. On JevBench's public items
+the 9B is therefore not better than the 4B; its gains are on the held-out checks above.
+
+**v0.2 against the untrained model and v0.1:** on the hard tier v0.2 fixes 21 of the untrained
+model's items and breaks 7 (McNemar p = 0.013); against v0.1 it fixes 9 and breaks 2. Per family,
+the gains are probability 0.50 -> 0.70, ambiguous 0.71 -> 0.86, trade-offs 0.83 -> 1.00, long
+policies 0.47 -> 0.58, multi-step lookups 0.72 -> 0.78 and dates and numbers 0.40 -> 0.47; judging
+answers slips 0.82 -> 0.76 (one item).
+
+**Known weak spots:**
+- v0.3's hard-tier calibration is slightly worse than v0.2's (ECE 0.071 against 0.066), and the
+  9B's is worse again (0.095).
+- For the 4B, the temperature is fitted on hard questions, so standard-tier confidence is too low
+  (ECE 0.117 for v0.3, 0.141 for v0.2).
+- JevK5-9B drops two standard-tier items against the 4B (0.944 against 0.972).
 
 ## Install and use
 
 ```bash
-pip install "jevk5[fast] @ git+https://github.com/allebee/jevk5@v0.2.0"
+pip install "jevk5[fast] @ git+https://github.com/allebee/jevk5@v0.3.0"
 ```
 
 ```python
 from jevk5 import JevK5
 
-model = JevK5("alibiserikbay/JevK5")          # ~9 GB of GPU memory in bf16
+model = JevK5("alibiserikbay/JevK5")          # v0.3, ~9 GB of GPU memory in bf16
+# model = JevK5("alibiserikbay/JevK5-9B")     # ~19 GB
 model.decide(
     "Refunds need a receipt and a purchase within 30 days. "
     "The customer bought 12 days ago and has no receipt.",
@@ -96,6 +151,9 @@ model.decide(
 Question types: `noul` (yes/no, optional `criteria` {"true": ..., "false": ...}), `choice`
 (`criteria` {key: description} or a list of keys), `score` (`criteria` a list of level
 descriptions, lowest first).
+
+To keep using v0.2, load the Hub tag through a local copy:
+`JevK5(huggingface_hub.snapshot_download("alibiserikbay/JevK5", revision="v0.2"))`.
 
 ### More than 16 options
 
@@ -124,6 +182,20 @@ Index's request shape, 500 items each and none that v0.2 trained on
 | BANKING77 | 77 | 6 | 0.690 | 0.674 | 0.039 | 116 ms |
 | CLINC150 with out-of-scope | 151 | 11 | 0.666 | 0.720 | 0.039 | 199 ms |
 
+v0.3, on the same items (none of them in v0.3's training or dev data), with the same second
+temperature:
+
+| Train split | v0.3 (4B) accuracy / macro-F1 / ECE | JevK5-9B accuracy / macro-F1 / ECE |
+|---|---:|---:|
+| MASSIVE en-US | 0.768 / 0.757 / 0.025 | 0.808 / 0.806 / 0.087 |
+| BANKING77 | 0.636 / 0.620 / 0.075 | 0.730 / 0.720 / 0.118 |
+| CLINC150 with out-of-scope | 0.706 / 0.741 / 0.068 | 0.772 / 0.807 / 0.088 |
+
+v0.3 (4B) is better than v0.2 on CLINC150 and MASSIVE. It is worse on BANKING77, where it is also
+overconfident. The 0.77 was fitted for v0.2 and is unchanged. JevK5-9B is the most accurate here but
+overconfident. The 0.77 was fitted for the 4B, and the 9B's passes combined at 1.0 give ECE 0.039,
+0.056 and 0.050. The runtime does not yet support a second temperature per model.
+
 The alternative we built, `method="tree"`, reads one pass whose letters stand for whole groups. It
 scored 0.636 on BANKING77 and 0.584 on CLINC150, and is kept only to reproduce the comparison.
 Through llama.cpp, the Q8_0 file gives the same answer as bf16 on 95 of 100 BANKING77 items and on
@@ -131,7 +203,8 @@ Through llama.cpp, the Q8_0 file gives the same answer as bf16 on 95 of 100 BANK
 
 **Weak spot: out of scope.** On CLINC150, "none of the listed intents" reaches the final in all 91
 out-of-scope items but wins it in only 33. It also wins in 58 in-scope items, which leaves recall
-and precision at 0.36 each.
+and precision at 0.36 each (v0.2). v0.3 (4B) recalls 0.37 with precision 0.62. JevK5-9B recalls 0.43
+with precision 0.74.
 
 As a server:
 
@@ -150,24 +223,31 @@ linear-attention layers fall back to transformers' PyTorch code.
 GGUF builds for [llama.cpp](https://github.com/ggml-org/llama.cpp), which runs on NVIDIA, AMD,
 Intel and Apple GPUs and on plain CPUs, are in
 [JevK5-GGUF](https://huggingface.co/alibiserikbay/JevK5-GGUF), next to a smaller
-[JevK5-2B](https://huggingface.co/alibiserikbay/JevK5-2B) trained the same way. Each file was
-checked against its unquantized model on the 231 public items:
+[JevK5-2B](https://huggingface.co/alibiserikbay/JevK5-2B) trained with the v0.2 recipe. Each file
+was checked against its unquantized model on the 231 public items:
 
-| File | Size | Same answer as bf16 | Hard tier (bf16) |
-|---|---:|---:|---:|
-| `jevk5-4b-v0.2-Q8_0.gguf` | 4.48 GB | 228 / 231 | 0.721 (0.739) |
-| `jevk5-4b-v0.2-Q4_K_M.gguf` | 2.71 GB | 219 / 231 | 0.730 (0.739) |
-| `jevk5-2b-v0.2-Q8_0.gguf` | 2.01 GB | 226 / 231 | 0.622 (0.604) |
+| File | Size | Same answer as bf16 | Hard tier (bf16) | Temperature |
+|---|---:|---:|---:|---:|
+| `jevk5-4b-v0.3-Q8_0.gguf` | 4.48 GB | 228 / 231 | 0.730 (0.748) | 1.367 |
+| `jevk5-4b-v0.3-Q5_K_M.gguf` | 3.07 GB | 221 / 231 | 0.730 (0.748) | 1.367 |
+| `jevk5-9b-v0.3-Q8_0.gguf` | 9.53 GB | 228 / 231 | 0.766 (0.757) | 1.089 |
+| `jevk5-9b-v0.3-Q5_K_M.gguf` | 6.47 GB | 224 / 231 | 0.757 (0.757) | 1.089 |
+| `jevk5-4b-v0.2-Q8_0.gguf` | 4.48 GB | 228 / 231 | 0.721 (0.739) | 1.532 |
+| `jevk5-4b-v0.2-Q4_K_M.gguf` | 2.71 GB | 219 / 231 | 0.730 (0.739) | 1.532 |
+| `jevk5-2b-v0.2-Q8_0.gguf` | 2.01 GB | 226 / 231 | 0.622 (0.604) | 1.42 |
+
+A v0.3 4B Q4_K_M changed 17 of 231 answers and is not published. Neither is the 9B Q4_K_M (218 of
+231 the same).
 
 ```bash
-llama-server --hf-repo alibiserikbay/JevK5-GGUF --hf-file jevk5-4b-v0.2-Q8_0.gguf -c 8192 -ngl 99
-pip install --no-deps "jevk5 @ git+https://github.com/allebee/jevk5@v0.2.1"   # standard library only
+llama-server --hf-repo alibiserikbay/JevK5-GGUF --hf-file jevk5-4b-v0.3-Q8_0.gguf -c 8192 -ngl 99
+pip install --no-deps "jevk5 @ git+https://github.com/allebee/jevk5@v0.3.0"   # standard library only
 ```
 
 ```python
 from jevk5 import JevK5GGUF
 
-model = JevK5GGUF()                 # llama-server on :8080; JevK5GGUF(temperature=1.42) for the 2B
+model = JevK5GGUF(temperature=1.367)  # llama-server on :8080; use the file's temperature (table)
 model.decide("Order #7120 shows delivered to No. 17; the customer lives at No. 71.",
              {"type": "choice", "instructions": "What happened to the parcel?",
               "criteria": ["delivered", "misdelivered", "unknown"]})
@@ -185,15 +265,24 @@ decision on a CPU alone, and 0.6 s for the 4B on an M1 Pro; consumer GPUs are no
    decision families (policy exceptions, date and number traps, multi-step lookups, judging
    answers, ambiguity, misleading notes, injected instructions, rule precedence, routing,
    extraction, rubrics). It answers every question twice, independently; a question is kept only
-   when both answers match the intended one. Option keys are rebuilt from the option text.
-2. **Training** ([training/lora.py](training/lora.py)): LoRA rank 16 on attention projections,
-   cross-entropy on the option-letter logits, 3,272 teacher questions + 3,272 human-labelled items
-   (MMLU-Pro, WANLI, MultiNLI, BoolQ, banking77, ARC, CommonsenseQA; the MMLU-Pro items came from
-   its test split, see [the correction](CHANGELOG.md)), 2 epochs, lr 3e-5. A question
-   that carries an exact distribution trains against it rather than a single letter (9 so far).
-3. **Calibration:** one temperature (1.532), fitted on teacher questions from three domains that
-   training never saw. A temperature per question type and averaging two option orders were both
-   measured on held-out data and rejected ([training/temp_choice.py](training/temp_choice.py),
+   when both answers match the intended one. Option keys are rebuilt from the option text. v0.3
+   adds 14,138 questions written and checked the same way by GPT-6 Luna through OpenAI's API
+   (`--provider openai`). Its families are dates and numbers, rubrics, ambiguity, multi-step
+   lookups, causal and plausibility judgements, stance and sarcasm, tool choice, and paraphrases
+   of Qwen questions. Those outputs are subject to OpenAI's terms.
+2. **Replay** (v0.3): 32,425 human-labelled items from the train splits of 27 public datasets,
+   listed with their licenses on the model card. No test or validation split of any dataset is
+   used. Every row is checked against the Decision Index benchmarks' test and validation text and
+   JevBench's public items (exact match or any shared 8-word sequence).
+3. **Training** ([training/lora.py](training/lora.py)): LoRA rank 16 on attention projections,
+   cross-entropy on the option-letter logits, lr 3e-5. v0.3: 17,408 teacher questions + 32,425
+   replay items, 1 epoch. v0.2: 3,272 + 3,272, 2 epochs. v0.2's replay included MMLU-Pro test
+   items; see [the correction](CHANGELOG.md). A question that carries an exact distribution trains
+   against it rather than a single letter.
+4. **Calibration:** one temperature (v0.3: 1.367 for the 4B and 1.089 for the 9B; v0.2: 1.532),
+   fitted on teacher questions from three domains that training never saw. A temperature per
+   question type and averaging two option orders were both measured on held-out data and rejected
+   ([training/temp_choice.py](training/temp_choice.py),
    [training/order_avg.py](training/order_avg.py)).
 
 No JevBench item and no output of Jev was used for training, tuning or model selection (with one correction, see [CHANGELOG](CHANGELOG.md)).
@@ -213,7 +302,9 @@ See [bench/SUBMISSION.md](bench/SUBMISSION.md).
 
 ## Credits
 
-Qwen3.5-4B and Qwen3.6-27B by the Qwen team (Apache-2.0). Prompt and readout adapted from
+Qwen3.5-4B, Qwen3.5-9B and Qwen3.6-27B by the Qwen team (Apache-2.0). GPT-6 Luna by OpenAI wrote
+most of v0.3's teacher questions. The public datasets in the replay belong to their authors (list
+and licenses on the model card). Prompt and readout adapted from
 [SemIf](https://github.com/TheoLeeCJ/SemIf) by TheoLeeCJ (MIT); see [NOTICE](NOTICE).
 Evaluated with [JevBench](https://github.com/fstandhartinger/jevbench) (MIT). Not affiliated with
 TypeSafe AI or Jev.

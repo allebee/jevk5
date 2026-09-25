@@ -3,10 +3,10 @@
 Start llama-server with a GGUF from huggingface.co/alibiserikbay/JevK5-GGUF, then ask it for typed
 decisions:
 
-    llama-server --hf-repo alibiserikbay/JevK5-GGUF --hf-file jevk5-4b-v0.2-Q8_0.gguf -c 8192 -ngl 99
+    llama-server --hf-repo alibiserikbay/JevK5-GGUF --hf-file jevk5-4b-v0.3-Q8_0.gguf -c 8192 -ngl 99
 
     from jevk5 import JevK5GGUF
-    model = JevK5GGUF()                      # JevK5GGUF(temperature=1.42) for the 2B file
+    model = JevK5GGUF(temperature=1.367)     # each file's temperature is on the JevK5-GGUF card
     model.decide("Delivered to No. 17; the customer lives at No. 71.",
                  {"type": "choice", "instructions": "What happened to the parcel?",
                   "criteria": ["delivered", "misdelivered", "unknown"]})
@@ -41,9 +41,11 @@ class JevK5GGUF:
     """JevK5 read through a running llama-server.
 
     `url` is the server (llama-server's default port); `temperature` defaults to the value in a
-    `jevk5_config.json` passed as `config`, or to JevK5 v0.2's 1.532. Use 1.42 for JevK5-2B. `top_k` asks for that many token log-probabilities at the answer
-    position, which needs to cover the 16 letters. `method` reads questions with more than 16
-    options, "knockout" or "tree", exactly as the CUDA runtime does (`jevk5.prompt.spread`).
+    `jevk5_config.json` passed as `config`, or to JevK5 v0.2's 1.532. Pass the file's own value:
+    1.367 for JevK5 v0.3 (4B), 1.089 for JevK5-9B, 1.42 for JevK5-2B. `top_k` asks for that many
+    token log-probabilities at the answer position, which needs to cover the 16 letters. `method`
+    reads questions with more than 16 options, "knockout" or "tree", exactly as the CUDA runtime
+    does (`jevk5.prompt.spread`).
     """
 
     def __init__(
