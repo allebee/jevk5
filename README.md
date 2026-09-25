@@ -291,6 +291,74 @@ Its strength is calibration, not accuracy:
 
 The model card has the tables, the training data and its licenses.
 
+### JevK5-Lite on JevBench and the Decision Index
+
+**JevBench.** `bench/jevk5_lite.py` is an in-process adapter that plugs into JevBench's own runner, like
+`bench/jevk5_direct.py`: copy it into `jevbench/adapters/` and apply `bench/jevbench-registration.patch`, which
+registers both adapters. It maps each question to one JevK5-Lite head:
+- **Text:** the state.
+- **Task:** the instructions.
+- **noul:** the labels are "true" and "false".
+- **choice:** the option descriptions, or the keys when a description is empty.
+- **score:** the level texts.
+
+The probabilities are mapped back to the option ids. Results on the 231 public items, through JevBench's runner,
+CPU only (bf16, 16 threads), against JevK5 v0.2 on an H100:
+
+| | JevK5-Lite (CPU) | JevK5 v0.2 4B (GPU) |
+|---|---:|---:|
+| easy (48) | 0.958 | 1.000 |
+| original, standard (72) | 0.750 | 0.958 |
+| hard, public half (111) | 0.405 | 0.739 |
+| hard-tier ECE | 0.269 | 0.066 |
+| distance to the gold distributions (10 probability items, TVD) | 0.310 | 0.196 |
+| p50 latency, easy and standard / hard | 71 / 205 ms | 13.5 / 30 ms |
+
+**Decision Index.** Every index question is a `choice` with 2 to 255 options, and a row can hold several questions.
+One `classify` call answers a whole row, one head per question:
+
+```python
+import json
+from jevk5 import JevK5Lite
+
+lite = JevK5Lite.from_pretrained("alibiserikbay/JevK5-Lite", threads=16)
+
+def answer_row(row: dict) -> dict:
+    """A Decision Index row -> {question id: {"type", "choice", "probabilities"}}, in one pass."""
+    text = row["state"] if isinstance(row["state"], str) else json.dumps(row["state"], ensure_ascii=False)
+    tasks, back = {}, {}
+    for qid, q in row["questions"].items():
+        name = q["instructions"] if isinstance(q["instructions"], str) else json.dumps(q["instructions"])
+        if name in tasks:  # two questions with the same instructions
+            name = f"{qid}: {name}"
+        keys = list(q["criteria"])
+        labels = [str(q["criteria"][k] or k) for k in keys]
+        if len(set(labels)) < len(labels):
+            labels = [f"{k}: {d}" for k, d in zip(keys, labels)]
+        tasks[name], back[name] = labels, (qid, dict(zip(labels, keys)))
+    out = {}
+    for name, result in lite.classify(text, tasks).items():
+        qid, key_of = back[name]
+        probs = {key_of[label]: p for label, p in result["probabilities"].items()}
+        out[qid] = {"type": "choice", "choice": max(probs, key=probs.get), "probabilities": probs}
+    return out
+```
+
+**Coverage: what JevK5-Lite handles, and how.** A refused or failed row scores 0 on both benchmarks.
+
+| Case | Handling |
+|---|---|
+| Free-form numbers | Not asked by either benchmark (every question has typed options); JevK5-Lite cannot produce one. |
+| Distribution targets (JevBench's 10 probability items) | Mapped: the softmax over the options is the distribution. TVD 0.310, against the 4B's 0.196. |
+| More than 16 options | Mapped: there is no letter limit, and every option is scored in one pass. Labels come first within 512 tokens, so a long option list leaves less room for the text. |
+| Option lists too long for the window | Refused, scoring 0. If the task and label names alone need more than 509 tokens, the runtime raises instead of truncating labels. The index's BANKING77 label set (77 intents) needs 521, so those rows are refused; CLINC150 (151 short intents, 466 tokens) and MASSIVE (299) fit. |
+| Several questions in one row | Mapped: one head per question, in one pass. The questions share the 512-token budget. |
+| Documents past 512 tokens | Truncated: the state is cut from its end. On JevBench this hit 52 of the 111 hard items (median state 2,188 tokens); accuracy on them is 0.346, against 0.458 on the other hard items. |
+| Multi-step reasoning, dates and numbers | Answered, but weakly: hard-tier multi-hop 0.11 and temporal and numeric 0.27. It is a classifier with no reasoning step. |
+| Malformed questions (a choice with fewer than two options) | Refused by the runtime, recorded as a failure, and scored 0. None of the 231 public items was refused. |
+
+JevK5-Lite runs on a CPU, which is what it is for. Every number above is from a CPU with 16 threads.
+
 ## How it was made
 
 1. **Teacher data** ([training/teacher.py](training/teacher.py)): Qwen3.6-27B with thinking writes
