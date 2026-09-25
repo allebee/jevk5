@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.3.3
+
+- **JevK5-9B v0.3.3 weights** at [alibiserikbay/JevK5-9B](https://huggingface.co/alibiserikbay/JevK5-9B)
+  (Qwen3.5-9B, `temperature` 1.316, `knockout_temperature` 1.05, Apache-2.0). The same v0.3 data, trained
+  for 1.5 epochs instead of 1. v0.3's 9B stays available under the Hub tag `v0.3`. The runtime and the 4B
+  are unchanged.
+- The epoch count came from a sweep whose rule was fixed before the results: per size, adopt the epoch
+  count with the best mean of index proxy, held-out teacher accuracy and hand-written hard set only if the
+  mean beats 1 epoch by at least 0.02 and none of the three drops by more than 0.03. 9B: 1.5 epochs,
+  mean 0.798 → 0.834 (index proxy 0.762 → 0.794, teacher 0.851 → 0.848, hard set 0.781 → 0.859). 4B:
+  2 epochs gained only 0.010, so the 1-epoch 4B stays. One seed per setting.
+- JevBench public (report only): hard tier 0.730 → 0.775 (6 fixed, 1 broken), hard-tier ECE 0.126 →
+  0.071; the 4B's hard tier is 0.784.
+- More than 16 options (500 train items each): MASSIVE / BANKING77 / CLINC150 accuracy 0.814 / 0.754 / 0.804
+  (v0.3's 9B 0.818 / 0.734 / 0.780); CLINC150 out-of-scope recall 0.59 (0.46). bev-decision test sample 0.698
+  (0.700).
+- Calibration on the held-out teacher questions is a little worse (ECE 0.032 → 0.043).
+- GGUF: JevK5-GGUF adds the 9B v0.3.3 Q8_0 (229/231 answers the same as the bf16 weights on JevBench's
+  public items) and Q5_K_M (228/231). The Q4_K_M agreed on 222 but lost 5 hard items and is not published.
+  Use `JevK5GGUF(url, temperature=1.316, knockout_temperature=1.05)`.
+
 ## 0.3.2
 
 - Adds `bench/jevk5_lite.py`, the JevBench adapter for JevK5-Lite; the registration patch

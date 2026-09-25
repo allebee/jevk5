@@ -11,6 +11,11 @@ splits only, and a new [JevK5-9B](https://huggingface.co/alibiserikbay/JevK5-9B)
 [What changed in v0.3](#what-changed-in-v03). Most of the gains are on held-out and index-style
 data; on JevBench's public items the 4B gains on the hard tier and loses one standard item.
 
+**JevK5-9B v0.3.3:** the 9B retrained for 1.5 epochs (a pre-registered epoch sweep): hard tier
+0.775 against v0.3's 0.730, hard-tier ECE 0.071 against 0.126, `temperature` 1.316 and
+`knockout_temperature` 1.05. The 9B numbers below are v0.3's unless marked; the
+[JevK5-9B card](https://huggingface.co/alibiserikbay/JevK5-9B) has v0.3.3's, and v0.3 stays at the Hub tag `v0.3`.
+
 **Independent result:** [JevBench v1.4](https://github.com/fstandhartinger/jevbench) ranks JevK5
 v0.2 **second of 76 systems and first among open entrants** (62.04; Jev 1.13.0: 63.29). On its 308
 fresh sealed decisions, JevK5 answered 33.1% correctly and Jev answered 36.7%; the [evaluator calls
@@ -171,7 +176,7 @@ retraining:
    option gets its group's share of the final times its in-group probability.
 4. The letter temperature is fitted on questions of up to 16 options and leaves this combination
    miscalibrated, so it is sharpened by a second temperature. Since 0.3.0 each model carries its
-   own, `knockout_temperature` in its `jevk5_config.json` (v0.3 4B: 0.93, JevK5-9B: 1.2). A
+   own, `knockout_temperature` in its `jevk5_config.json` (v0.3 4B: 0.93, JevK5-9B v0.3: 1.2, v0.3.3: 1.05). A
    config without it (v0.2) keeps 0.77, and `knockout_temperature=` in `JevK5` or `JevK5GGUF`
    overrides both. Every value is fitted on 500 items of MASSIVE's train split, which is not a
    Decision Index benchmark. It never changes the answer.
