@@ -29,7 +29,8 @@ def descriptions(prompt: str) -> list[str]:
 
 class FakeGGUF(JevK5GGUF):
     def __init__(self, **kwargs):
-        super().__init__(temperature=1.532, **kwargs)
+        kwargs.setdefault("temperature", 1.532)
+        super().__init__(**kwargs)
         self.prompts = []
 
     def _logprobs(self, prompt):
@@ -40,12 +41,13 @@ class FakeGGUF(JevK5GGUF):
         return {LETTERS[i]: v - log_total for i, v in enumerate(z)}, len(prompt), 0.001
 
 
-def fake_cuda(method="knockout"):
+def fake_cuda(method="knockout", knockout_temperature=None):
     torch = pytest.importorskip("torch")  # noqa: F841 - the runtime module imports it
     from jevk5.runtime import JevK5
 
     model = JevK5.__new__(JevK5)
     model.temperature, model.method, model.prompts = 1.532, method, []
+    model.knockout_temperature = knockout_temperature
 
     def encode(state, criterion, options):
         system, user = messages(state, criterion, options)
@@ -101,3 +103,74 @@ def test_tokens_add_up_over_passes(n, passes):
 def test_unknown_method_is_refused_up_front():
     with pytest.raises(ValueError):
         JevK5GGUF(method="vote")
+
+
+# knockout_temperature: a per-model second temperature over more than 16 options (jevk5 0.3.0).
+
+
+def write_config(tmp_path, **values):
+    path = tmp_path / "jevk5_config.json"
+    path.write_text(json.dumps(values))
+    return path
+
+
+def test_gguf_reads_knockout_temperature_from_config(tmp_path):
+    path = write_config(tmp_path, temperature=1.089, knockout_temperature=1.0)
+    model = JevK5GGUF(config=str(path))
+    assert model.temperature == 1.089
+    assert model.knockout_temperature == 1.0
+
+
+def test_gguf_argument_overrides_config(tmp_path):
+    path = write_config(tmp_path, temperature=1.089, knockout_temperature=1.0)
+    model = JevK5GGUF(config=str(path), knockout_temperature=0.9)
+    assert model.knockout_temperature == 0.9
+
+
+def test_config_without_the_key_keeps_the_default(tmp_path):
+    path = write_config(tmp_path, temperature=1.532)
+    assert JevK5GGUF(config=str(path)).knockout_temperature is None  # prompt.TEMPERATURES applies
+    assert JevK5GGUF().knockout_temperature is None
+    assert JevK5GGUF().temperature == 1.532  # no config: v0.2's temperature, as before
+
+
+def test_cuda_config_reader(tmp_path):
+    pytest.importorskip("torch")
+    from jevk5.runtime import _load_config, _load_temperature
+
+    write_config(tmp_path, temperature=1.367, knockout_temperature=1.05)
+    assert _load_config(str(tmp_path)) == {"temperature": 1.367, "knockout_temperature": 1.05}
+    assert _load_temperature(str(tmp_path)) == 1.367
+
+
+@pytest.mark.parametrize("n", [3, 16, 17, 77, 151])
+def test_knockout_temperature_touches_only_wide_questions(n):
+    default, explicit, custom = (
+        FakeGGUF(),
+        FakeGGUF(knockout_temperature=0.77),
+        FakeGGUF(knockout_temperature=1.0),
+    )
+    p_default, _ = default.probabilities({}, question(n))
+    p_explicit, _ = explicit.probabilities({}, question(n))
+    p_custom, _ = custom.probabilities({}, question(n))
+    assert p_explicit == p_default  # 0.77 is the default, so passing it changes nothing
+    if n <= 16:
+        assert p_custom == p_default  # one pass: no second temperature
+    else:
+        assert p_custom != p_default
+        top = max(p_default, key=p_default.get)
+        assert p_custom[top] < p_default[top]  # 1.0 sharpens less than 0.77
+
+
+@pytest.mark.parametrize("n", [17, 77, 151])
+def test_cuda_and_gguf_agree_with_a_knockout_temperature(n):
+    cuda, gguf = fake_cuda(knockout_temperature=1.0), FakeGGUF(knockout_temperature=1.0)
+    p_cuda, _ = cuda.probabilities({}, question(n))
+    p_gguf, _ = gguf.probabilities({}, question(n))
+    for key in p_cuda:
+        assert math.isclose(p_cuda[key], p_gguf[key], rel_tol=1e-5, abs_tol=1e-9)
+
+
+def test_tree_ignores_the_knockout_temperature():
+    base, set_ = FakeGGUF(method="tree"), FakeGGUF(method="tree", knockout_temperature=0.5)
+    assert base.probabilities({}, question(77))[0] == set_.probabilities({}, question(77))[0]

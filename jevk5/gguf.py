@@ -45,7 +45,8 @@ class JevK5GGUF:
     1.367 for JevK5 v0.3 (4B), 1.089 for JevK5-9B, 1.42 for JevK5-2B. `top_k` asks for that many
     token log-probabilities at the answer position, which needs to cover the 16 letters. `method`
     reads questions with more than 16 options, "knockout" or "tree", exactly as the CUDA runtime
-    does (`jevk5.prompt.spread`).
+    does (`jevk5.prompt.spread`); `knockout_temperature` sharpens the knockout's combined
+    distribution and defaults to the config's `knockout_temperature`, else prompt.TEMPERATURES.
     """
 
     def __init__(
@@ -56,6 +57,7 @@ class JevK5GGUF:
         timeout_s: float = 600.0,
         config: str | None = None,
         method: str = "knockout",
+        knockout_temperature: float | None = None,
     ) -> None:
         if method not in METHODS:
             raise ValueError(f"unknown method {method!r}; use one of {METHODS}")
@@ -63,14 +65,27 @@ class JevK5GGUF:
         self.url = url.rstrip("/")
         self.top_k = top_k
         self.timeout_s = timeout_s
-        self.temperature = temperature if temperature is not None else self._temperature(config)
+        values = self._config(config)
+        self.temperature = (
+            temperature if temperature is not None else float(values.get("temperature", 1.532))
+        )
+        if knockout_temperature is None and "knockout_temperature" in values:
+            knockout_temperature = float(values["knockout_temperature"])
+        self.knockout_temperature = knockout_temperature
         self.missing = 0  # decisions where an option letter fell outside top_k
 
     @staticmethod
-    def _temperature(config: str | None) -> float:
+    def _config(config: str | None) -> dict:
+        """The jevk5_config.json passed as `config`; without one, the temperature is v0.2's."""
         if config and Path(config).exists():
-            return float(json.loads(Path(config).read_text()).get("temperature", 1.0))
-        return 1.532
+            values = json.loads(Path(config).read_text())
+            values.setdefault("temperature", 1.0)
+            return values
+        return {}
+
+    @staticmethod
+    def _temperature(config: str | None) -> float:
+        return float(JevK5GGUF._config(config).get("temperature", 1.532))
 
     def _post(self, path: str, payload: dict) -> dict:
         request = urllib.request.Request(
@@ -127,7 +142,8 @@ class JevK5GGUF:
             total = sum(weights)
             return [w / total for w in weights]
 
-        probs = spread(read, [text for _, text in options], self.method)
+        second = self.knockout_temperature if self.method == "knockout" else None
+        probs = spread(read, [text for _, text in options], self.method, second)
         return {key: v for (key, _), v in zip(options, probs, strict=True)}, tokens
 
     def decide(self, state, question: dict) -> dict:

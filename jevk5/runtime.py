@@ -36,17 +36,22 @@ from .prompt import (  # noqa: F401 - public re-exports
 GRAPH_LENGTHS = (128, 192, 256, 320, 384, 512, 640, 768, 1024, 1536, 2048, 3072, 4096)
 
 
-def _load_temperature(source: str) -> float:
-    """JevK5's calibration temperature, stored next to the weights in jevk5_config.json."""
+def _load_config(source: str) -> dict:
+    """jevk5_config.json next to the weights (local folder or Hub repo); {} for a base model."""
     path = Path(source) / "jevk5_config.json"
     if not path.exists():
         try:
             from huggingface_hub import hf_hub_download
 
             path = Path(hf_hub_download(source, "jevk5_config.json"))
-        except Exception:  # noqa: BLE001 - base models have no config; use 1.0
-            return 1.0
-    return float(json.loads(path.read_text()).get("temperature", 1.0))
+        except Exception:  # noqa: BLE001 - base models have no config
+            return {}
+    return json.loads(path.read_text())
+
+
+def _load_temperature(source: str) -> float:
+    """JevK5's calibration temperature, stored next to the weights in jevk5_config.json."""
+    return float(_load_config(source).get("temperature", 1.0))
 
 
 class JevK5:
@@ -58,9 +63,12 @@ class JevK5:
         graphs: bool = True,
         temperature: float | None = None,
         method: str = "knockout",
+        knockout_temperature: float | None = None,
     ) -> None:
         """`method` reads questions with more than 16 options: "knockout" or "tree" (see
-        `jevk5.prompt.spread`). Questions with up to 16 options take one pass either way."""
+        `jevk5.prompt.spread`). Questions with up to 16 options take one pass either way.
+        `knockout_temperature` sharpens the knockout's combined distribution; it defaults to the
+        model's `knockout_temperature` in jevk5_config.json, else to prompt.TEMPERATURES."""
         import transformers
 
         if method not in METHODS:
@@ -81,7 +89,13 @@ class JevK5:
             raise ValueError("Every answer letter must be one token")
         self.slots = [ids[0] for ids in slots]
         self.slot_weight = self.model.lm_head.weight[self.slots].detach().contiguous()
-        self.temperature = temperature if temperature is not None else _load_temperature(source)
+        config = _load_config(source)
+        self.temperature = (
+            temperature if temperature is not None else float(config.get("temperature", 1.0))
+        )
+        if knockout_temperature is None and "knockout_temperature" in config:
+            knockout_temperature = float(config["knockout_temperature"])
+        self.knockout_temperature = knockout_temperature
         self.graphs: dict[int, tuple] = {}
         if graphs and os.environ.get("JEVK5_GRAPHS", "1") != "0":
             self.capture()
@@ -147,7 +161,8 @@ class JevK5:
             p /= p.sum()
             return [float(v) for v in p]
 
-        probs = spread(read, [text for _, text in options], self.method)
+        second = self.knockout_temperature if self.method == "knockout" else None
+        probs = spread(read, [text for _, text in options], self.method, second)
         return {key: v for (key, _), v in zip(options, probs, strict=True)}, tokens
 
     def decide(self, state, question: dict) -> dict:
