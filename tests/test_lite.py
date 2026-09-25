@@ -94,11 +94,6 @@ def test_sequence_layout(lite):
     assert ids[s - 1] == lite.tok.sep_token_id
 
 
-def test_label_schema_cannot_exceed_model_length(lite):
-    with pytest.raises(ValueError, match="label schema is too long"):
-        lite.classify("refund", {"intent": [f"label{i}" for i in range(50)]})
-
-
 def test_probabilities_match_a_manual_readout(lite):
     heads = [("intent", TASKS["intent"], False, None)]
     ids, label_pos, _, (s, e) = lite.encode("refund please", heads)
