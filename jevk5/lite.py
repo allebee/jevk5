@@ -129,7 +129,12 @@ class JevK5Lite:
                 label_pos.append(1 + len(schema))  # after [CLS]
                 schema += [self.label_id] + self._piece(label)
             spans.append((start, len(label_pos)))
-        room = max(16, self.max_len - len(schema) - 3)
+        room = self.max_len - len(schema) - 3
+        if room < 1:
+            raise ValueError(
+                f"label schema is too long for max_len={self.max_len}; "
+                "use fewer or shorter task and label names"
+            )
         body = self.tok(text, add_special_tokens=False, truncation=True, max_length=room)[
             "input_ids"
         ]
