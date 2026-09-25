@@ -261,31 +261,33 @@ runtime, and on identical tokens the same probabilities. `bench/gguf_check.py` r
 231-item comparison on your own machine. Measured so far: about 0.25 s (2B) and 0.6 s (4B) per short
 decision on a CPU alone, and 0.6 s for the 4B on an M1 Pro; consumer GPUs are not measured yet.
 
-## JevK5-Lite: a CPU classifier (preview)
+## JevK5-Lite: a CPU classifier (preview, experimental)
 
 JevK5-Lite is a separate, experimental model: a 437M DeBERTa-v3-large that reads a text and any number of
 label sets in one encoder pass, on a CPU. It returns a calibrated probability per label, with a softmax for
 single-label heads and a sigmoid for multi-label heads.
 
 ```bash
-pip install "jevk5[lite] @ git+https://github.com/allebee/jevk5@TAG"
+pip install "jevk5[lite] @ git+https://github.com/allebee/jevk5@v0.3.1"
 ```
 
 ```python
 from jevk5 import JevK5Lite
 
-lite = JevK5Lite.from_pretrained("alibiserikbay/JevK5-Lite-preview", threads=16)
+lite = JevK5Lite.from_pretrained("alibiserikbay/JevK5-Lite", threads=16)
 lite.classify("I was charged twice, please refund one of them.",
               {"intent": ["refund_request", "order_status"],
                "areas": {"labels": ["billing", "shipping", "account"], "multi_label": True}})
 ```
 
-It does not beat the model it was built against:
-- **fast-decisions dev:** GLiNER2.5-Decide scores 0.637 head accuracy and 0.488 with all heads right, against 0.587
-  and 0.442 for Lite.
-- **Speed:** the same on a CPU; both are DeBERTa-v3-large.
-- **Neutral test:** on seven public datasets fixed in advance, Lite wins four, loses two, and has the slightly lower
-  mean. Its calibration was better on those sets and worse on fast-decisions.
+Its strength is calibration, not accuracy:
+- **Calibration:** on seven public datasets fixed in advance, its calibration error is lower than
+  GLiNER2.5-Decide's on all six single-label sets.
+- **Neutral accuracy:** it is significantly better on two sets (AG News, Yahoo Answers), within noise on three,
+  and worse on two (financial sentiment, GoEmotions). Decide's mean is higher.
+- **fast-decisions dev:** Decide is stronger, with head accuracy 0.637 against 0.587 and all heads right 0.488
+  against 0.442. Lite's calibration is worse there too.
+- **Speed:** both are DeBERTa-v3-large, with no speed difference to claim.
 
 The model card has the tables, the training data and its licenses.
 

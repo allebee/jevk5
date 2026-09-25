@@ -3,7 +3,7 @@
 from jevk5.prompt import decision_options, messages, prompt_text
 
 __all__ = ["JevK5", "JevK5GGUF", "JevK5Lite", "decision_options", "messages", "prompt_text"]
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 
 def __getattr__(name: str):

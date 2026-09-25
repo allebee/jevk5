@@ -1,14 +1,16 @@
 # Changelog
 
-## Unreleased (branch `lite`)
+## 0.3.1
 
-- `jevk5.JevK5Lite` (`pip install "jevk5[lite]"`, imported lazily): a CPU runtime for JevK5-Lite, a
-  label-conditioned DeBERTa-v3-large that scores every label of every head in one pass. The core install and
-  its dependencies are unchanged. The packaged runtime reproduces the evaluated model's probabilities: the same
-  top label on 294 of 294 heads, max |dp| 2.9e-7.
-- JevK5-Lite preview: GLiNER2.5-Decide is stronger on fastino/fast-decisions dev (0.637 vs 0.587 head accuracy).
-  On a neutral test of seven public datasets, fixed in advance, Lite wins four, loses two, and has a lower mean
-  (0.629 vs 0.643). CPU speed is the same.
+- Adds the optional JevK5Lite (`pip install "jevk5[lite]"`); changes nothing for JevK5 or JevK5-9B.
+  `jevk5.JevK5Lite` is imported only when used. It runs
+  [JevK5-Lite](https://huggingface.co/alibiserikbay/JevK5-Lite) (preview), a label-conditioned
+  DeBERTa-v3-large that scores every label of every head in one pass on a CPU. It reproduces the evaluated
+  model's probabilities: the same top label on 294 of 294 heads, max |dp| 2.9e-7.
+- JevK5-Lite is a preview. Against GLiNER2.5-Decide on seven public datasets fixed in advance, its
+  calibration error is lower on all six single-label sets. Its accuracy is significantly higher on two sets
+  (AG News, Yahoo Answers), within noise on three, and lower on two. Decide's mean is higher (0.643 against
+  0.629), and Decide is stronger on fastino/fast-decisions dev (0.637 against 0.587).
 
 ## 0.3.0
 

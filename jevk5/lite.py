@@ -2,7 +2,7 @@
 
     from jevk5 import JevK5Lite
 
-    lite = JevK5Lite.from_pretrained("alibiserikbay/JevK5-Lite-preview")   # a Hub repo or a local folder
+    lite = JevK5Lite.from_pretrained("alibiserikbay/JevK5-Lite")   # a Hub repo or a local folder
     lite.classify(
         "I was charged twice for the same order, please refund one of them.",
         {"intent": ["refund_request", "order_status", "cancel_subscription"],
