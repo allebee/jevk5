@@ -20,6 +20,7 @@ dependencies = [
 
 [project.optional-dependencies]
 fast = ["flash-linear-attention>=0.5", "einops"]
+lite = ["safetensors>=0.4"]
 
 [project.scripts]
 jevk5-serve = "jevk5.server:main"

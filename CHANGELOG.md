@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased (branch `lite`)
+
+- `jevk5.JevK5Lite` (`pip install "jevk5[lite]"`, imported lazily): a CPU runtime for JevK5-Lite, a
+  label-conditioned DeBERTa-v3-large that scores every label of every head in one pass. The core install and
+  its dependencies are unchanged. The packaged runtime reproduces the evaluated model's probabilities: the same
+  top label on 294 of 294 heads, max |dp| 2.9e-7.
+- JevK5-Lite preview: GLiNER2.5-Decide is stronger on fastino/fast-decisions dev (0.637 vs 0.587 head accuracy).
+  On a neutral test of seven public datasets, fixed in advance, Lite wins four, loses two, and has a lower mean
+  (0.629 vs 0.643). CPU speed is the same.
+
 ## 0.3.0
 
 - **JevK5 v0.3 weights** at [alibiserikbay/JevK5](https://huggingface.co/alibiserikbay/JevK5)
