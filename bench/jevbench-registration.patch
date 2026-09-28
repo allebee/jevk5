@@ -1,6 +1,8 @@
+diff --git a/jevbench/adapters/__init__.py b/jevbench/adapters/__init__.py
+index c71d476..1047618 100644
 --- a/jevbench/adapters/__init__.py
 +++ b/jevbench/adapters/__init__.py
-@@ -22,6 +22,8 @@
+@@ -22,6 +22,8 @@ from .systemone_list import SystemOneListAdapter  # noqa: F401
  from .gradio_space import GradioSpaceAdapter  # noqa: F401
  from .local_openjev import LocalOpenJevAdapter  # noqa: F401
  from .semif_direct import SemIfDirectAdapter  # noqa: F401
@@ -9,30 +11,33 @@
  from .so1_decider import So1DeciderAdapter  # noqa: F401
  from .remote_inproc import RemoteInprocAdapter  # noqa: F401
  from .sg_system_one import SgSystemOneAdapter  # noqa: F401
+diff --git a/jevbench/cli.py b/jevbench/cli.py
+index da38bea..8d771db 100644
 --- a/jevbench/cli.py
 +++ b/jevbench/cli.py
-@@ -25,7 +25,7 @@
+@@ -25,7 +25,8 @@ from .adapters import (GradioSpaceAdapter, LocalOpenJevAdapter, NeedleLocalAdapt
                         RemoteInprocAdapter, SemIfDirectAdapter, SgSystemOneAdapter, So1DeciderAdapter,
                         TypeSafeAdapter, DjevAdapter,
                         LayaLocalAdapter, Gliner2LocalAdapter, VerdictLocalAdapter, PawLocalAdapter,
--                       ClassifierDevAdapter, CertoLocalAdapter)
-+                       ClassifierDevAdapter, CertoLocalAdapter, JevK5DirectAdapter, JevK5LiteAdapter)
+-                       ClassifierDevAdapter, CertoLocalAdapter, QwenFlashLinearAdapter)
++                       ClassifierDevAdapter, CertoLocalAdapter, QwenFlashLinearAdapter,
++                       JevK5DirectAdapter, JevK5LiteAdapter)
  from .budget import Ledger
  from .runner import DEFAULT_RESERVE_USD, Runner
  from .summarize import public_export, summarize
-@@ -64,8 +64,9 @@
-              "djev": DjevAdapter,
+@@ -65,8 +66,9 @@ def cmd_run(args) -> int:
               "laya_local": LayaLocalAdapter, "gliner2_local": Gliner2LocalAdapter,
               "verdict_local": VerdictLocalAdapter, "paw_local": PawLocalAdapter,
--             "classifier_dev": ClassifierDevAdapter, "certo_local": CertoLocalAdapter}
+              "classifier_dev": ClassifierDevAdapter, "certo_local": CertoLocalAdapter,
+-             "qwen_flash_linear": QwenFlashLinearAdapter}
 -    if args.adapter not in ("typesafe", "djev", "needle_local", "semif_direct", "so1_decider", "sg_system_one", "classifier_dev") and not args.endpoint:
-+             "classifier_dev": ClassifierDevAdapter, "certo_local": CertoLocalAdapter,
++             "qwen_flash_linear": QwenFlashLinearAdapter,
 +             "jevk5_direct": JevK5DirectAdapter, "jevk5_lite": JevK5LiteAdapter}
 +    if args.adapter not in ("typesafe", "djev", "needle_local", "semif_direct", "so1_decider", "sg_system_one", "classifier_dev", "jevk5_direct", "jevk5_lite") and not args.endpoint:
          print(f"--endpoint required for {args.adapter}", file=sys.stderr)
          return 2
      kwargs = dict(endpoint=args.endpoint, model=args.model,
-@@ -75,7 +76,8 @@
+@@ -76,7 +78,8 @@ def cmd_run(args) -> int:
      if args.adapter == "openai_compat":
          kwargs["model"] = args.model or ""
      if args.adapter in ("local_openjev", "semif_direct", "so1_decider", "sg_system_one",
@@ -42,13 +47,12 @@
          kwargs["revision"] = args.revision
      adapter = kinds[args.adapter](**kwargs)
      if args.cost_basis:
-@@ -164,7 +166,8 @@
-                                 "local_openjev", "openai_compat", "needle_local",
+@@ -166,7 +169,7 @@ def main(argv=None) -> int:
                                  "semif_direct", "so1_decider", "remote_inproc",
                                  "sg_system_one", "djev", "laya_local", "gliner2_local",
--                                "verdict_local", "paw_local", "classifier_dev", "certo_local"])
-+                                "verdict_local", "paw_local", "classifier_dev", "certo_local",
-+                                "jevk5_direct", "jevk5_lite"])
+                                 "verdict_local", "paw_local", "classifier_dev", "certo_local",
+-                                "qwen_flash_linear"])
++                                "qwen_flash_linear", "jevk5_direct", "jevk5_lite"])
      p_run.add_argument("--endpoint", default=None)
      p_run.add_argument("--model", default=None)
      p_run.add_argument("--key-env", dest="key_env",
