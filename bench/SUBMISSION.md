@@ -9,8 +9,11 @@ Three rows, all with in-process adapters and no server. The JevBench request is
 | JevK5-9B v0.3.3 | `jevk5_direct` | `alibiserikbay/JevK5-9B` | `d6521a18a86999190e9d775c915af3d6d6772fc4` (tag `v0.3.3`) | CUDA GPU, ~20 GB |
 | JevK5-Lite preview-1 (experimental) | `jevk5_lite` | `alibiserikbay/JevK5-Lite` | `315ee211f828a899161477c534cea23e84ba3568` (tag `preview-1`) | CPU |
 
+The code commit below contains the v0.3.3 runtime and a registration patch checked against
+JevBench `main` at `fd54ea7` (2026-09-28). Model weights are pinned separately above.
+
 ```bash
-git clone https://github.com/allebee/jevk5 && cd jevk5 && git checkout v0.3.3
+git clone https://github.com/allebee/jevk5 && cd jevk5 && git checkout 6578e777222a075c4c8001b0e147bce6dd013eba
 pip install -e ".[fast,lite]"   # torch, transformers>=5.17, flash-linear-attention; safetensors for Lite
 cp bench/jevk5_direct.py bench/jevk5_lite.py <jevbench>/jevbench/adapters/
 cd <jevbench> && git apply <jevk5>/bench/jevbench-registration.patch   # registers both adapters
