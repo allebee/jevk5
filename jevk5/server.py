@@ -5,8 +5,8 @@
         "questions": {"refund": {"type": "noul", "instructions": "Asks for money back?"}}}'
 
 Answers carry "noul" (probability of true) for yes/no questions and "probabilities" for choice
-and score questions, the shape JevBench's typesafe adapter reads. One GPU, one model: requests
-are served one at a time, each question as one CUDA-graph replay.
+and score questions, the shape JevBench's typesafe adapter reads. One device, one model: requests
+are served one at a time, with CUDA graphs on CUDA devices and eager execution elsewhere.
 """
 
 from __future__ import annotations
@@ -89,10 +89,13 @@ def make_handler(model: JevK5, name: str):
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--model", default="alibiserikbay/JevK5")
+    parser.add_argument(
+        "--device", default="cuda", help="PyTorch device (default: cuda; e.g. cpu or cuda:1)"
+    )
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8090)
     args = parser.parse_args(argv)
-    model = JevK5(args.model)
+    model = JevK5(args.model, device=args.device, graphs=args.device.split(":")[0] == "cuda")
     server = ThreadingHTTPServer((args.host, args.port), make_handler(model, args.model))
     print(f"serving {args.model} on http://{args.host}:{args.port}/v1/systemone", flush=True)
     server.serve_forever()

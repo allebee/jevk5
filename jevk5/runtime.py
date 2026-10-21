@@ -111,14 +111,15 @@ class JevK5:
         for n in lengths:
             ids = torch.zeros((1, n), dtype=torch.long, device=self.device)
             last = torch.full((1,), n - 1, dtype=torch.long, device=self.device)
-            stream = torch.cuda.Stream()
-            stream.wait_stream(torch.cuda.current_stream())
+            stream = torch.cuda.Stream(device=self.device)
+            current = torch.cuda.current_stream(self.device)
+            stream.wait_stream(current)
             with torch.cuda.stream(stream):
                 for _ in range(3):
                     self._slot_logits(ids, last)
-            torch.cuda.current_stream().wait_stream(stream)
+            current.wait_stream(stream)
             graph = torch.cuda.CUDAGraph()
-            with torch.cuda.graph(graph):
+            with torch.cuda.device(self.device), torch.cuda.graph(graph, stream=stream):
                 out = self._slot_logits(ids, last)
             self.graphs[n] = (graph, ids, last, out)
 

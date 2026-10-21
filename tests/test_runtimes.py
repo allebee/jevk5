@@ -9,6 +9,8 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+from contextlib import contextmanager
+from types import SimpleNamespace
 
 import pytest
 
@@ -60,6 +62,77 @@ def fake_cuda(method="knockout", knockout_temperature=None):
 
     model.encode, model.letter_logits = encode, letter_logits
     return model
+
+
+@pytest.mark.parametrize("device", ["cuda:0", "cuda:1"])
+def test_cuda_capture_uses_model_device(monkeypatch, device):
+    torch = pytest.importorskip("torch")
+    from jevk5.runtime import JevK5
+
+    waits, forwards, captures = [], [], []
+
+    def make_stream(device=None):
+        stream = SimpleNamespace(device=torch.device(device or active.device))
+        stream.wait_stream = lambda other: waits.append((stream.device, other.device))
+        return stream
+
+    # The process and PyTorch's cached graph stream start on GPU 0, not necessarily
+    # the model's device. Allocating tensors on GPU 1 does not change either one.
+    default = make_stream("cuda:0")
+    active = default
+
+    @contextmanager
+    def use_stream(stream):
+        nonlocal active
+        previous, active = active, stream
+        try:
+            yield
+        finally:
+            active = previous
+
+    @contextmanager
+    def use_device(device):
+        with use_stream(make_stream(device)):
+            yield
+
+    @contextmanager
+    def capture_graph(graph, stream=None):
+        assert active.device == torch.device(device)
+        with use_stream(stream or default):
+            captures.append(active.device)
+            yield
+
+    def tensor(*args, device, **kwargs):
+        return SimpleNamespace(device=torch.device(device))
+
+    def slot_logits(ids, last):
+        forwards.append(active.device)
+        assert active.device == ids.device == last.device == torch.device(device)
+        return object()
+
+    monkeypatch.setattr(torch, "zeros", tensor)
+    monkeypatch.setattr(torch, "full", tensor)
+    monkeypatch.setattr(torch.cuda, "Stream", make_stream)
+    monkeypatch.setattr(torch.cuda, "device", use_device)
+    monkeypatch.setattr(
+        torch.cuda, "current_stream",
+        lambda device=None: make_stream(device) if device is not None else active,
+    )
+    monkeypatch.setattr(torch.cuda, "stream", use_stream)
+    monkeypatch.setattr(torch.cuda, "CUDAGraph", object)
+    monkeypatch.setattr(torch.cuda, "graph", capture_graph)
+    model = JevK5.__new__(JevK5)
+    model.device, model.graphs = device, {}
+    monkeypatch.setattr(model, "_slot_logits", slot_logits)
+
+    model.capture(lengths=(8, 16))
+
+    target = torch.device(device)
+    assert waits == [(target, target)] * 4
+    assert forwards == [target] * 8  # three warmups and one capture per length
+    assert captures == [target] * 2
+    assert list(model.graphs) == [8, 16]
+    assert active is default
 
 
 def question(n: int) -> dict:

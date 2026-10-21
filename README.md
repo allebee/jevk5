@@ -223,6 +223,11 @@ curl -s localhost:8090/v1/systemone -d '{"state": "Order #7120 shows delivered t
                          "criteria": ["delivered", "misdelivered", "unknown"]}}}'
 ```
 
+The server defaults to `--device cuda`; use `--device cuda:1` to select another GPU. To run the
+PyTorch runtime on a CPU (slower), use
+`jevk5-serve --model alibiserikbay/JevK5 --device cpu --port 8090`. CUDA graphs are disabled on
+non-CUDA devices; `JEVK5_GRAPHS=0` still disables them on CUDA.
+
 `flash-linear-attention` (the `fast` extra) speeds up long inputs; without it, Qwen3.5's
 linear-attention layers fall back to transformers' PyTorch code.
 
